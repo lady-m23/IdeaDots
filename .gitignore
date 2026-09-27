@@ -1,0 +1,73 @@
+# --- OS / editors ---
+.DS_Store
+._*
+*.swp
+*.swo
+*~
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/*
+!.vscode/extensions.json
+.history/
+
+# --- Secrets (never commit) ---
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+*.p8
+*.p12
+*.mobileprovision
+*.provisionprofile
+*.cer
+**/GoogleService-Info.plist
+**/google-services.json
+secrets/
+
+# --- Flutter / Dart ---
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+*.g.dart.tmp
+/lib/l10n/generated/
+**/doc/api/
+.metadata.local
+
+# --- iOS / macOS (Xcode, CocoaPods) ---
+**/Pods/
+**/.symlinks/
+**/xcuserdata/
+**/DerivedData/
+**/*.xcworkspace/xcuserdata/
+**/Flutter/Flutter.framework
+**/Flutter/Flutter.podspec
+**/Flutter/Generated.xcconfig
+**/Flutter/ephemeral/
+**/Flutter/app.flx
+**/Flutter/app.zip
+**/Flutter/flutter_assets/
+**/Flutter/flutter_export_environment.sh
+**/ServiceDefinitions.json
+**/Runner/GeneratedPluginRegistrant.*
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.xcarchive
+
+# --- Supabase CLI ---
+supabase/.temp/
+supabase/.branches/
+supabase/.env
+supabase/functions/.env
+
+# --- Tooling ---
+*.log
+.fvm/flutter_sdk
