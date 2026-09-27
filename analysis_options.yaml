@@ -1,0 +1,31 @@
+# Static analysis for Ideaholder. `flutter analyze` must report zero issues.
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  exclude:
+    - build/**
+    - ios/**
+    - macos/**
+    - lib/l10n/generated/**
+
+formatter:
+  # Keep trailing commas so `dart format` and `require_trailing_commas` agree.
+  trailing_commas: preserve
+
+linter:
+  rules:
+    - always_declare_return_types
+    - avoid_print
+    - avoid_dynamic_calls
+    - prefer_const_constructors
+    - prefer_const_constructors_in_immutables
+    - prefer_const_declarations
+    - prefer_const_literals_to_create_immutables
+    - prefer_final_locals
+    - prefer_single_quotes
+    - require_trailing_commas
+    - unawaited_futures

@@ -8,6 +8,6 @@ the execution roadmap is `docs/Ideaholder_Implementation_Plan_v1.6.md`; working 
 agents are in `CLAUDE.md`.
 
 To run it, install Flutter (stable) and Xcode, copy `.env.example` to `.env.dev` and fill in the
-Supabase URL and anon key, then run `tool/run_dev.sh macos` or `tool/run_dev.sh ios` (any extra
+Supabase URL and anon key, then run `tool/run_dev.sh -d macos` or `tool/run_dev.sh -d <simulator id>` (all
 arguments go to `flutter run`). `flutter analyze` and `flutter test` must stay clean; CI runs both
 plus iOS and macOS builds on every push.

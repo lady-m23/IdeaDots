@@ -1,0 +1,7 @@
+{
+  "@@locale": "en",
+  "appTitle": "Ideaholder",
+  "@appTitle": {
+    "description": "The app name, shown as the window and scaffold title."
+  }
+}
