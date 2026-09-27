@@ -1,8 +1,9 @@
 name: CI
 
+# macOS runners bill at 10x on private repositories, so CI runs on main and on pull requests only.
 on:
   push:
-    branches: ['**']
+    branches: [main]
   pull_request:
   workflow_dispatch:
 

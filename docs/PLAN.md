@@ -1,8 +1,8 @@
-# Ideaholder — Product & Technical Plan
+# IdeaDots — Product & Technical Plan
 
-**Version:** 1.6 (implementation baseline) · **Date:** 2026-09-27 · **Status:** approved for P0
+**Version:** 1.7 (monetization update, name IdeaDots) · **Date:** 2026-09-28 · **Status:** P0 done; approved for P1
 
-Ideaholder (Korean: 아이디어홀더; formerly the working name "ToDoDesk") is a personal memo workspace that **looks like a messenger but behaves like a memo list**.
+IdeaDots (formerly "Ideaholder" and the working name "ToDoDesk"; Korean display name open, Q13) is a personal memo workspace that **looks like a messenger but behaves like a memo list**.
 Memos, tasks, links and files live in swipeable **groups**. Inside a group they are independent,
 movable, groupable, collapsible and styleable items. On the Mac it stays open all day as a slim,
 phone-shaped window; on iPhone it feels identical.
@@ -13,7 +13,8 @@ phone-shaped window; on iPhone it feels identical.
 | `design/tokens.json` | Design tokens: shared scales, two release themes (Paper, Dark), 10 group color families with memo shades, color roles, app accent |
 | Screen spec (canvas): https://claude.ai/artifact/2jiaiT6JmJ8nQ87HCbFCgN | Annotated wireframes for every screen in this plan (boards A–L) |
 | Earlier canvas: https://claude.ai/artifact/LbkmKd4bHkDwMCETm91PPj | First mockups and theme studies (historical; the screen spec wins on conflict) |
-| `docs/Ideaholder_Implementation_Plan_v1.6.md` | Phase → task → subtask execution roadmap for the coding agent, derived from this plan v1.6 |
+| `docs/IdeaDots_Implementation_Plan_v1.7.md` | Phase → task → subtask execution roadmap for the coding agent, derived from this plan v1.7 |
+| `docs/MONETIZATION_PLAN.md` | Plans, limits, reverse trial, downgrade rules, ad rules, Supabase cost model and revenue scenarios (§7–§9 summarize it) |
 | `docs/archive/PLAN_v0.2.md` | Earlier version of this plan (superseded) |
 
 This document is the single source of truth. When the screen spec and this plan disagree, this plan
@@ -28,7 +29,7 @@ wins and the spec must be fixed.
 The input bar, bubbles and swipeable groups borrow the familiar look of a chat app. Nothing else
 about chat carries over:
 
-| Chat assumption | Ideaholder rule |
+| Chat assumption | IdeaDots rule |
 |---|---|
 | Every message has a visible timestamp | **No timestamps are shown anywhere.** The only time a user sees is a time they set (an alarm). |
 | Date separators appear automatically | **No automatic date grouping.** Sections exist only when the user creates a separator (`--`). |
@@ -65,7 +66,7 @@ All decisions below are locked. Changing one needs the owner's confirmation.
 | C3 | Items behave like a **sortable memo list**: select, move/reorder vertically, restyle, mark important (§4.4, §4.5) |
 | C4 | `[]` stays the task syntax. The planned task toggle in the input bar is **replaced by a memo alarm** control (§4.8) |
 | C5 | Memo alarm: set a time on a memo; at that time a short **toast-style alarm** appears on **mobile and desktop** (§4.8) |
-| C6 | Free plan keeps the **10-group limit** (§9) |
+| C6 | ~~Free plan keeps the **10-group limit**~~ → superseded by M2 (5 groups) |
 | C7 | Release themes: **Paper and Dark only**. The theme system must accept more backgrounds later without a migration (§11) |
 | C8 | The fixed-items bar shows **only memos with an active alarm** (§4.9) |
 | C9 | **No direct video attachments**; users paste a video link instead (§4.10) |
@@ -97,7 +98,7 @@ All decisions below are locked. Changing one needs the owner's confirmation.
 
 | # | Decision |
 |---|---|
-| D12 | **App name: Ideaholder** (아이디어홀더), confirmed 2026-09-27. Replaces the working name "ToDoDesk" everywhere (bundle names, deep links `ideaholder://`, store listings). Visual design (Persimmon tokens, group color rules) is unchanged. Before launch: KIPRIS / USPTO trademark search and a check of the Korean App Store; a quick web search on 2026-09-27 found no app with this exact name, but the "idea notes" category is crowded (Idea Notes, IdeaNest, Idea Vault, …). Icon direction: a clipboard "holder" filled with a loading/in-progress motif (dots or ring); final pick from the Name & Color Explorations canvas (https://claude.ai/artifact/WmNGEncqFS46tTiCGXF8md) |
+| D12 | *Superseded by D27 (IdeaDots).* **App name: Ideaholder** (아이디어홀더), confirmed 2026-09-27. Replaces the working name "ToDoDesk" everywhere (bundle names, deep links `ideaholder://`, store listings). Visual design (Persimmon tokens, group color rules) is unchanged. Before launch: KIPRIS / USPTO trademark search and a check of the Korean App Store; a quick web search on 2026-09-27 found no app with this exact name, but the "idea notes" category is crowded (Idea Notes, IdeaNest, Idea Vault, …). Icon direction: a clipboard "holder" filled with a loading/in-progress motif (dots or ring); final pick from the Name & Color Explorations canvas (https://claude.ai/artifact/WmNGEncqFS46tTiCGXF8md) |
 | D13 | **Stay signed in until the user signs out.** After one successful sign-in on a device, the app never asks again unless the user signs out, deletes the account, or the session is revoked (§5.5) |
 | D14 | **App icon: C1 "clipboard with typing dots"** — a clipboard (the *holder*) with three dots of decreasing strength, like a chat "typing…" indicator (an idea being written). The same three dots are the app's loading indicator. Full spec §11.6. The other explored icons stay in the explorations canvas as alternatives |
 | D15 | **Sign-in screen = layout S4** (centered icon, name, tagline, three buttons at the bottom) with the C1 icon, and it **opens in the user's appearance**: the device's light/dark setting before the first sign-in, the app's own Appearance choice afterwards (§5.6) |
@@ -114,21 +115,42 @@ All decisions below are locked. Changing one needs the owner's confirmation.
 
 | # | Decision |
 |---|---|
-| D19 | **Own git repository.** `git init` in `/Users/leonie/Projects/004 Ideaholder` (formerly `008 Draftboard`); the folder leaves the home-directory repository. (resolves the handoff note) |
+| D19 | **Own git repository.** `git init` in `/Users/leonie/Projects/004 IdeaDots` (formerly `004 Ideaholder`, `008 Draftboard`); the folder leaves the home-directory repository. (resolves the handoff note) |
 | D20 | **Supabase: same organization as TaskHolder, new project, region Seoul (`ap-northeast-2`).** (resolves Q4) |
 | D21 | **Email sign-in = 6-digit one-time code only.** No passwords. Transactional email through an external sender (Resend or equivalent) configured as Supabase custom SMTP. (resolves Q1) |
 | D22 | **Mac deletes only through selection too:** click / ⌘-click / ⇧-click to select, then ⌫ or the selection toolbar. No Delete in the right-click menu. (closes the D17 default) |
-| D23 | **Free limits: 500 MB total, 10 MB per file.** (resolves Q2) |
+| D23 | **Free limits: 500 MB total, 10 MB per file.** (resolves Q2) → 500 MB confirmed by the owner on 2026-09-28 (M6) |
 | D24 | **Quick-capture photo while offline is not saved.** The preview's Send is disabled with "You're offline — photos can't be saved yet"; the same rule as every other attachment (§4.16). The memo text of the sheet still queues. |
 | D25 | **Separator deletion stays in the separator menu** ("Delete separator (keep items)" and "Delete section and items", each with a confirmation). Memos are still multi-select only. |
 | D26 | **Mac distribution: Mac App Store only** (universal purchase with iOS; sandboxed). (resolves Q3) |
+| D27 | **App name: IdeaDots** (2026-09-28; supersedes D12). Replaces "IdeaDots" everywhere: Dart package `ideadots`, bundle ids `com.<owner>.ideadots` and `.widgets`, App Group `group.<bundle>`, deep links `ideadots://`, widget target `IdeaDotsWidgets`, store listings. Folder `/Users/leonie/Projects/004 IdeaDots`; repository https://github.com/lady-m23/IdeaDots (private). The C1 icon (D14) is unchanged; its three dots now also echo the name. Korean display name open (Q13); until then the Korean UI shows "IdeaDots". Before launch: KIPRIS / USPTO trademark search and a Korean App Store check for the new name |
+| D28 | **Languages are added per launch country without code changes** (2026-09-28). Launch with Korean and English; every string, locale list, format and layout rule is built so a new language is a data change (§10.5) |
 
 Defaults kept without a question (change any time before the phase that uses it): storage backend
-Supabase Storage for P0–P1, decision before P2 (Q5); Free search limited to the last 90 days (Q6);
-pricing ₩2,900 / ₩24,000 and the 7-day Mac trial (Q7); Korean fonts Pretendard + Noto Serif KR
+Supabase Storage for P0–P1, decision before P2 (Q5); pricing ₩2,900 / ₩24,000 (Q7); Korean fonts Pretendard + Noto Serif KR
 (Q8); photo captions allowed (I11).
 
-### 2.8 Implementation defaults chosen in this plan
+### 2.8 Monetization decisions (2026-09-28, plan v1.7)
+
+Details, numbers and reasoning: `docs/MONETIZATION_PLAN.md`.
+
+| # | Decision |
+|---|---|
+| M1 | **7-day Pro reverse trial at the account's first sign-in, on any platform**, with no payment method; once per person (hashed identity ledger that survives account deletion). Replaces the 7-day Mac trial. |
+| M2 | **Free: 5 groups** (was 10, C6). Above 5 after the trial, the user picks 5 active groups; the rest are **paused** (read-only, nothing lost). |
+| M3 | **No lifetime purchase.** |
+| M4 | **Ads on Free only**; the trial and Pro are ad-free. Banner: AdMob on iOS, house banner on Mac. |
+| M5 | **The 90-day Free search window is dropped** (resolves Q6). Free is limited by items per group instead (Q10); search covers the full history on every plan. |
+| M6 | **Free storage: 500 MB total** (resolves Q9; the 200 MB proposal is not adopted), 10 MB per file. |
+| M7 | **iOS Free shows occasional interstitial ads from launch** (resolves Q12), under the strict moments and caps of §8; `ads.interstitial.enabled` stays as a remote kill switch. |
+| M8 | **macOS uses only in-house/promotional ads, never third-party ads:** the house banner plus an occasional **house interstitial** (a promo card) under the same rules as M7. No third-party ad SDK is linked into the Mac app. |
+| M9 | **Android and Windows** (later platforms, still out of scope, §3.2) will show a banner plus occasional interstitials, the same rules as iOS. |
+
+Proposed defaults awaiting the owner (§14): Free 1,000 items per group (Q10) and Pro storage 20 GB
+(Q11). Q9 and Q12 were answered on 2026-09-28 (M6, M7).
+The body of this plan already uses these values; change them in `plan_limits` if the answers differ.
+
+### 2.9 Implementation defaults chosen in this plan
 
 These fill gaps the decisions above leave open. They are defaults, not owner decisions; change
 them freely before the relevant phase starts.
@@ -154,7 +176,7 @@ them freely before the relevant phase starts.
 ### 3.1 MVP (v1.0): macOS 13+ and iOS 17+
 
 - **Groups:** create (header `+` or the end page), rename inline, recolor (10 color families),
-  reorder, delete, swipe between them. Free: up to 10 groups.
+  reorder, delete, swipe between them. Free: up to 5 groups (M2), 1,000 items per group (Q10).
 - **Items:** text memo, task, link (preview card), file, image, **separator**. Edit, convert
   memo ↔ task; delete only through multi-select.
 - **Sections:** `--date` / `--<text>` separators, expand/collapse per section.
@@ -169,9 +191,10 @@ them freely before the relevant phase starts.
 - **Search:** server-side, Korean substring search.
 - **Export:** group → Markdown file.
 - **Accounts:** Apple, Google, email one-time code, QR login on Mac.
-- **Monetization:** storage quotas, Free banner ad (iOS) / house banner (Mac), Pro subscription.
+- **Monetization:** storage quotas, Free ads (iOS: banner + occasional interstitial; Mac: house ads
+  only), 7-day Pro reverse trial, Pro subscription.
 - **Mac window:** tall window, remembered frame, menu bar icon.
-- **Languages:** Korean and English.
+- **Languages:** Korean and English at launch; more added per launch country as data (D28, §10.5).
 
 ### 3.2 Explicitly out of scope for the MVP
 
@@ -186,7 +209,7 @@ them freely before the relevant phase starts.
 | Keep on top / always-on-top window, pinned memos | D2. Emphasis comes from memo color |
 | Repeating alarms, server push alarms | Later |
 | Share extension, no-UI Siri/Shortcuts intent, Mac desktop widget | Later |
-| Android, Windows, web client | Later |
+| Android, Windows, web client | Later (their ad rule is fixed by M9) |
 | Shared groups, collaboration | Later |
 | Offline mode (local database), E2EE | Not planned |
 | Rich text / Markdown rendering inside items | Later |
@@ -214,7 +237,11 @@ Screen references (A–L) point to boards in the screen spec canvas.
   last group leaves only the empty page.
 - Reorder groups: a list page titled "Reorder groups" (no count), drag handles, tap a row to open
   that group.
-- Free plan: 10 groups. `+` on the 11th opens the Pro sheet.
+- Free plan: 5 groups (M2). `+` on the 6th opens the Pro sheet. Paused groups (after a trial or an
+  expired Pro) show a lock chip in the header and a "Paused group" bar instead of the input bar
+  (`docs/MONETIZATION_PLAN.md` §4.2).
+- Free plan: 1,000 items per group (Q10; separators and trash don't count). From 900 the input bar
+  shows a counter; at 1,000 it is replaced by "This group is full" with Upgrade and Select to clean up.
 
 **Empty page ("Nothing here yet")** (board C)
 - Always present as the **page after the last group**, and the only page when there are no groups
@@ -409,7 +436,7 @@ Screen references (A–L) point to boards in the screen spec canvas.
 - Results show group color + group name + **section title** (no dates) and the matching text
   highlighted. Tapping jumps to the item (expanding sections and replies as needed).
 - Server-side Postgres `pg_trgm`; 1–2 character queries fall back to a scan of the user's rows.
-- Free: results from the last 90 days (by internal `created_at`); Pro: all. See open question Q6.
+- Every plan searches the full history (M5); the old Free 90-day window is dropped.
 
 ### 4.13 Markdown export (board C)
 
@@ -459,7 +486,7 @@ Two actions everywhere (D16): **Write memo** and **Take photo**.
   photo; default Write memo), so a user can place both.
 - **Lock Screen widgets** (accessory circular): one per action. **Control Center controls**
   (iOS 18+): one per action.
-- Deep links: `ideaholder://capture` (memo) and `ideaholder://capture?mode=photo` (photo).
+- Deep links: `ideadots://capture` (memo) and `ideadots://capture?mode=photo` (photo).
 - **Memo mode:** the app launches straight into the **capture sheet** — text field focused,
   keyboard up, target group chip (tap to change), bell for an alarm, a camera button, Send.
 - **Photo mode:** the app launches straight into the **system camera** (rear camera, photos only,
@@ -541,7 +568,7 @@ management UX. For ordinary memo sensitivity that cost is too high for v1.
 ### 5.3 QR login
 1. The Mac calls Edge Function `qr-login/start` → row in `qr_login_requests` (`nonce`,
    `device_name`, `status=pending`, `expires_at = now + 120 s`) and shows a QR code with
-   `ideaholder://qr?id=…&nonce=…`.
+   `ideadots://qr?id=…&nonce=…`.
 2. The Mac subscribes to that row via Realtime.
 3. The signed-in iPhone scans it (Settings → Sign in on Mac), shows "Sign in on *MacBook Air*?",
    and on approval calls `qr-login/approve` with its own JWT.
@@ -600,7 +627,7 @@ Goal: sign in once per device; stay signed in until an explicit sign-out.
 ### 5.6 Sign-in screen (D15)
 
 Layout (iPhone; the Mac window uses the same order at 400 pt width):
-1. Centered block: C1 app icon (108 pt tile), "Ideaholder" (Fraunces 36 in Paper; IBM Plex Sans
+1. Centered block: C1 app icon (108 pt tile), "IdeaDots" (Fraunces 36 in Paper; IBM Plex Sans
    Bold 36 in Dark, following the theme's display font), tagline "Your ideas, one message away."
    (ko: "아이디어를 메시지 하나로 담아 두세요.").
 2. Bottom block: Continue with Apple, Continue with Google, Continue with email, then the terms line.
@@ -632,7 +659,7 @@ Flutter app (iOS / macOS)
   ├─ local draft/outbox file ── draft preservation (§4.15)
   ├─ google_mobile_ads (iOS) · purchases_flutter (RevenueCat)
   ├─ window_manager · hotkey_manager · tray_manager (macOS)
-  └─ native extensions: iOS WidgetKit widgets + Control (Swift), deep link ideaholder://capture
+  └─ native extensions: iOS WidgetKit widgets + Control (Swift), deep link ideadots://capture
 
 Supabase (one project)
   ├─ Postgres + RLS    groups, items, attachments, link_previews, usage, entitlements, qr_login_requests
@@ -677,14 +704,21 @@ items (
 attachments   (id, item_id, user_id, storage_key, mime, size_bytes, width, height, thumb_key, created_at)
 link_previews (url_hash pk, url, title, description, image_key, site_name, fetched_at)
 usage         (user_id pk, bytes_used bigint, file_count int)          -- maintained by trigger
-entitlements  (user_id pk, plan text, quota_bytes, max_file_bytes, max_groups, ads bool, renews_at)
+entitlements  (user_id pk, trial_started_at, trial_ends_at, pro_expires_at, active_groups_changed_at, ab_bucket)
+plan_limits   (plan pk: free|trial|pro, max_groups, max_items_per_group, storage_bytes, max_file_bytes,
+               daily_upload_bytes, trash_days, ads bool)           -- limits are data, not code
+trial_ledger  (identity_hash pk, first_trial_at)                   -- survives account deletion (M1)
+app_config    (key pk, value jsonb)                                -- remote flags (interstitial), read-only to clients
 qr_login_requests (id, nonce, device_name, status, token_hash, expires_at)
 devices       (session_id pk, user_id, device_name, platform, last_seen_at, created_at)  -- §5.5; revoke = end that session
 ```
 
 Constraints: separators have `parent_id is null` and `alarm_at is null`; replies cannot have
-replies (trigger); the number of live groups per user is ≤ `entitlements.max_groups` (insert
-trigger).
+replies (trigger); the plan is computed by `effective_plan(uid)` (Pro if `pro_expires_at > now()`,
+else trial if `trial_ends_at > now()`, else Free) and never stored; the number of active groups is
+≤ `plan_limits.max_groups` and a group's live non-separator items are ≤ `max_items_per_group`
+(insert triggers; `groups.paused` and `groups.item_count` columns). Details:
+`docs/MONETIZATION_PLAN.md` §8.
 
 Indexes: `items (group_id, parent_id, position) where deleted_at is null`;
 `items (user_id, alarm_at) where alarm_at is not null and deleted_at is null`;
@@ -738,7 +772,7 @@ Indexes: `items (group_id, parent_id, position) where deleted_at is null`;
 
 ### 6.7 Quick-capture plumbing
 - iOS: a WidgetKit extension (Swift) with Home Screen + Lock Screen widgets and a Control Center
-  control; all use the deep link `ideaholder://capture`. The group name for the widget label is
+  control; all use the deep link `ideadots://capture`. The group name for the widget label is
   shared through an App Group with `home_widget`. Deep links are handled with `app_links`.
 - macOS: `hotkey_manager` registers ⌥Space; a `tray_manager` menu bar item hosts the popover.
 - Cold start into the capture sheet must stay under about 1.5 s on an iPhone 12-class device;
@@ -767,8 +801,10 @@ Indexes: `items (group_id, parent_id, position) where deleted_at is null`;
 
 | | Free | Pro |
 |---|---|---|
-| Total storage | 500 MB | 30 GB |
+| Total storage | 500 MB (M6) | 20 GB (Q11) |
 | Max per file | 10 MB | 200 MB |
+| Uploads per day | 50 MB | 2 GB |
+| Items per group | 1,000 (Q10) | unlimited (guard 50,000) |
 | Images | Compressed on device | Original option |
 | Video | **Not supported** (link instead) | **Not supported** (link instead) |
 | Trash | 7 days | 30 days |
@@ -776,7 +812,10 @@ Indexes: `items (group_id, parent_id, position) where deleted_at is null`;
 Enforcement is server-side: `upload-intent` checks size, MIME type (no video, no executables) and
 quota, then returns a signed upload URL scoped to `user_id/…`. A trigger inserts `attachments` and
 updates `usage`. At 80% a one-time notice; at 100% attachments are blocked with the Pro sheet while
-text, tasks, links, separators and alarms keep working. Free has a per-day upload cap.
+text, tasks, links, separators and alarms keep working. Limits are rows in `plan_limits`, and the
+plan is derived by `effective_plan()` (see `docs/MONETIZATION_PLAN.md` §8). During the 7-day trial
+the Pro column applies. Uploads cost nothing in transfer; storage ($0.0213/GB-month) and downloads
+(egress, $0.09/GB after 250 GB) are the variable costs (MONETIZATION_PLAN §2–§3).
 
 ---
 
@@ -785,9 +824,20 @@ text, tasks, links, separators and alarms keep working. Free has a per-day uploa
 - **iOS:** AdMob anchored adaptive banner at the very bottom under the input bar, Free only.
   Non-personalized by default (no ATT prompt); Google UMP consent for EEA/UK. At least 8 pt and a
   hairline between the input bar and the banner; hidden while the keyboard is up.
-- **macOS:** AdMob does not support macOS. The same 50 pt slot shows a **house banner** (Pro
-  upgrade, tips).
-- Pro removes the banner on every platform.
+- **macOS: house ads only (M8).** AdMob does not support macOS, and the Mac app links no
+  third-party ad SDK. The same 50 pt slot shows a **house banner** (Pro upgrade, tips,
+  cross-promotion of TaskHolder), and an occasional **house interstitial**: a dismissible promo card
+  over the window (Pro benefits, price, **Upgrade** and **Not now**, close visible at once) under
+  the same moments and caps as the iOS interstitial. House ads are bundled with the app: no
+  tracking, no ad-network calls.
+- Pro and the 7-day trial remove every ad on every platform (M4).
+- **Interstitial (iOS Free, M7):** occasional, **on from launch**; `ads.interstitial.enabled` is a
+  remote kill switch. Shown only after a finished action (closing Search, after Export, leaving
+  Reorder, after a multi-select action). Never in a session opened from the widget, quick capture,
+  share or a notification; never within 120 s of foregrounding; ≥ 3 h apart, ≤ 2 per day; never in
+  the 3 days after a trial ends. No app-open or rewarded ads. Full rules and monitoring:
+  `docs/MONETIZATION_PLAN.md` §6.
+- **Android / Windows (later, M9):** banner + occasional interstitial with the iOS rules.
 
 ---
 
@@ -796,21 +846,25 @@ text, tasks, links, separators and alarms keep working. Free has a per-day uploa
 | | Free | Pro (proposed price) |
 |---|---|---|
 | Price | ₩0 | ₩2,900 / month or ₩24,000 / year (US $2.49 / $19.99) |
-| Ads | Banner (iOS) / house banner (Mac) | None |
-| Groups | **Up to 10** | Unlimited |
-| Storage / per file | 500 MB / 10 MB | 30 GB / 200 MB |
-| Search | Last 90 days | Full history |
+| Ads | iOS: banner + occasional interstitial (M7) · Mac: house banner + occasional house interstitial (M8) | None |
+| Groups | **Up to 5** (M2) | Unlimited |
+| Items per group | 1,000 (Q10) | Unlimited |
+| Storage / per file | 500 MB (M6) / 10 MB | 20 GB (Q11) / 200 MB |
+| Search | Full history (M5) | Full history |
 | Trash | 7 days | 30 days |
 | Everything else (sections, alarms, replies, multi-select, quick capture, export, both themes) | Included | Included |
 
 - App Store in-app purchase; Mac App Store universal purchase so one subscription covers iPhone and
   Mac. The RevenueCat webhook writes `entitlements`. Apple Small Business Program (15%).
-- A 7-day Pro trial is offered at the first Mac sign-in.
+- **7-day Pro reverse trial** starts at the account's first sign-in on any platform, without a
+  payment method, once per person (M1). No App Store introductory offer. No lifetime purchase (M3).
+- When the trial or Pro ends, nothing is deleted or hidden: extra groups are paused, full groups
+  and full storage refuse only new additions (MONETIZATION_PLAN §4.2).
 - Positioning: KakaoTalk "나와의 채팅" users who want groups, sections, alarms and an always-visible
   desk window. Launch in Korea, then English-speaking markets.
-- Cost note: file storage and **download traffic** are the main variable costs. A heavy Pro user
-  who stores 30 GB and downloads a lot can cost more than the subscription at Supabase Storage
-  egress prices; see open question Q5.
+- Cost note: file storage and **download traffic** are the main variable costs; text is ~1 KB per
+  item and effectively free. A typical Free user costs ~₩10/month; the fixed floor is Supabase Pro
+  $25/month (≈ 28 Pro subscribers). Revenue scenarios: MONETIZATION_PLAN §5.
 
 ---
 
@@ -861,6 +915,41 @@ In selection mode the input bar is replaced by the selection toolbar (§4.7).
 platform support in P0.
 
 ---
+
+### 10.5 Localization and adding languages (D28)
+
+Launch languages are **Korean and English**. More languages are added per launch country, so
+adding one must be a data change, not a code change.
+
+- **Strings:** every user-facing string is an ARB key. `lib/l10n/app_en.arb` is the template;
+  each language is one more file `app_<code>.arb` (`app_ja.arb`, `app_zh_Hant.arb`, …). Messages use
+  ICU placeholders, plurals and selects (`{count, plural, …}`), never string concatenation, so
+  word order and plural rules work in any language.
+- **Supported locales come from the ARB files.** The app uses `AppLocalizations.supportedLocales`
+  (generated); no locale list is written by hand in Dart. Fallback: the device's language if
+  supported, else English.
+- **Apple platforms:** `CFBundleLocalizations` in the iOS and macOS `Info.plist` lists the same
+  codes (iOS only reports a language the bundle declares). Permission texts (camera, photos,
+  notifications) live in `InfoPlist.xcstrings`; widget and Control Center strings live in the widget
+  extension's `Localizable.xcstrings`.
+- **Checks:** `l10n.yaml` writes untranslated keys to a report, and a unit test fails when any ARB
+  file misses a key of the template. A new language cannot ship half-translated by accident.
+- **Formatting:** dates, times (alarm picker, toasts), numbers and storage sizes go through `intl`
+  with the active locale. Nothing assumes Korean or English word order. The `--date` separator
+  stays ISO `YYYY-MM-DD` in every language (it is data, not display text).
+- **Layout:** spacing and alignment use directional values (`EdgeInsetsDirectional`,
+  `AlignmentDirectional`, `start`/`end`) so a right-to-left language needs no layout rewrite. Text
+  never sits in fixed-width boxes; strings may be 40% longer than English.
+- **Fonts:** Latin and Hangul faces come from `design/tokens.json`; each new script (Japanese,
+  Chinese, Thai, …) adds a font fallback entry there, checked for licence and bundle size.
+- **Server text:** one-time-code emails and any other server-sent text are templated per
+  language; the client sends its locale with the request. Stored data is never translated.
+- **Outside the app:** App Store listing, screenshots, privacy-policy and terms pages, and support
+  replies per language (P19 checklist).
+- **Adding a language (checklist):** add `app_<code>.arb` with every key → add the code to both
+  `Info.plist` files and the `.xcstrings` catalogs → add font fallbacks if a new script → add email
+  templates → run `flutter test` (key-parity test) → owner or native reviewer checks the copy →
+  add store metadata.
 
 ## 11. Visual design and tokens
 
@@ -974,7 +1063,7 @@ Rules:
 - **macOS menu bar:** a monochrome *template* image, 16 pt: outlined clipboard + three filled dots
   (dots stepped 100 / 65 / 35% opacity), so macOS tints it for light/dark menu bars.
 - **Notifications and widgets** use the app icon; the widget header shows the small mark next to
-  "IDEAHOLDER".
+  "IDEADOTS".
 - **Loading indicator:** everywhere the app waits (launch splash, first sync, loading older items,
   Mac QR waiting, upload preparing), it shows **the three dots alone**, pulsing in turn: each dot
   animates opacity 0.25 → 1 → 0.25 over 1.2 s, staggered by 0.2 s. Inside a group the dots use the
@@ -1003,7 +1092,8 @@ Rules:
 | 9 | `pg_trgm` behavior with Korean depends on the database locale | Medium | Test Korean substring queries on the real project; fallback `ILIKE` | P0 |
 | 10 | Draft/outbox file corruption or conflicts with remote edits | Low | Atomic file writes; base `updated_at` check on edit drafts | P1 |
 | 11 | Link unfurl: slow sites, SSRF, bot blocking | Low–Medium | Async, guards, plain-link fallback | P1 |
-| 12 | Storage cost and egress for heavy file users | Medium | Quotas, compression, no video; decide storage backend (Q5) | Before P2 |
+| 12 | Storage cost and egress for heavy file users | Medium | Quotas (M6, Q11), compression, no video, disk cache, R2 trigger at $50/month Storage egress overage (MONETIZATION_PLAN §7) | Before P2 |
+| 15 | App Review questions a server-granted trial outside IAP (3.1.1) | Medium | Pro unlocked only through IAP; review note; fallback to an App Store 7-day introductory trial | P16 |
 | 13 | Long-press drag-to-reorder vs. horizontal group paging in the same list (swipe-to-delete removed by D17) | Medium: accidental group switches while reordering | Horizontal drags always page; drag-to-reorder only after long-press; prototype on device | P0 spike |
 | 14 | Photo capture from a widget: cold start straight into the camera, App Group hand-off of the target group, camera permission | Medium | Spike `image_picker` camera launch from the deep link; measure cold start; fallback to memo mode when denied | P0 spike |
 
@@ -1029,13 +1119,17 @@ Total to launch: roughly **15–17 weeks**.
 
 Resolved on 2026-09-27 (see §2.7): Q1 → code only (D21), Q2 → 500 MB / 10 MB (D23),
 Q3 → Mac App Store only (D26), Q4 → same organization, new project in Seoul (D20).
+Resolved on 2026-09-28: Q6 → 90-day window dropped (M5); Q9 → Free 500 MB (M6); Q12 → iOS
+interstitial on from launch (M7).
 
 | # | Still open | Default until answered | Needed by |
 |---|---|---|---|
-| Q5 | File storage backend: Supabase Storage or Cloudflare R2 behind signed URLs; adjust Pro storage (30 GB) to the egress cost | Supabase Storage | before P2 |
-| Q6 | Free search limit "last 90 days" relies on hidden creation time; keep, or limit Free to the current group instead? | Keep 90 days | P2 (search) |
-| Q7 | Pricing ₩2,900 / ₩24,000 and the 7-day Mac trial | As proposed | P2 (RevenueCat products) |
+| Q5 | File storage backend: Supabase Storage or Cloudflare R2 behind signed URLs | Supabase Storage; move files to R2 when Storage egress overage > $50/month or files > 3 TB (MONETIZATION_PLAN §7) | before P2 |
+| Q7 | Pricing ₩2,900 / ₩24,000 ($2.49 / $19.99) | As proposed | P2 (RevenueCat products) |
 | Q8 | Korean fonts: Pretendard + Noto Serif KR as fallbacks, or one Korean family for everything? | As in tokens; verify licensing and size in P0 | P0 |
+| Q10 | Free items per group (text is a product lever, not a cost: 5,000 items ≈ 5 MB ≈ ₩1/month) | 1,000 per group | P4 |
+| Q11 | Pro storage 30 GB or 20 GB (a full 30 GB yearly account leaves ~₩600/month margin) | 20 GB | P4 |
+| Q13 | Korean display name for IdeaDots (e.g. 아이디어닷츠, or keep the Latin name) | "IdeaDots" in both languages | P15 (store listing), P18 (copy review) |
 
 ---
 
@@ -1058,4 +1152,8 @@ Q3 → Mac App Store only (D26), Q4 → same organization, new project in Seoul 
 | "Inbox" auto-created at sign-in; last group can't be deleted; "+ New group" page | Empty "Nothing here yet" + `+` page after the last group and for new accounts (D4, I10) |
 | Video clips ≤ 10 MB on Free | No video attachments (C9) |
 | "Share extension, widgets" under Later | Quick-capture widgets in P1 (C10); share extension still Later |
+| Name Ideaholder (아이디어홀더), `ideaholder://` | IdeaDots, `ideadots://` (D27) |
+| Ads: iOS banner only; Mac house banner; interstitial off at launch | iOS banner + occasional interstitial (M7); Mac house banner + house interstitial (M8) |
+| Free: 10 groups, 500 MB, search last 90 days; 7-day trial on first Mac sign-in | Free: 5 groups (M2), 500 MB (M6), 1,000 items per group (Q10), full search (M5); 7-day reverse trial at first sign-in on any platform (M1) |
+| Pro 30 GB | 20 GB (Q11) |
 | Proposed on 2026-09-26: tags, large writing mode, AI credits, unlimited Free groups, Pro Plus tier, 30-day file retention on Free | Not adopted (C6, C11) |

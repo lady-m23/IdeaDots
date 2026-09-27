@@ -1,27 +1,30 @@
-# CLAUDE.md — Ideaholder
+# CLAUDE.md — IdeaDots
 
-Guidance for Claude Code sessions working in this folder (`/Users/leonie/Projects/004 Ideaholder`, formerly `008 Draftboard`).
+Guidance for Claude Code sessions working in this folder (`/Users/leonie/Projects/004 IdeaDots`, formerly `004 Ideaholder` and `008 Draftboard`).
 
 ## What this is
 
-**Ideaholder** (formerly the working name ToDoDesk; Korean 아이디어홀더) is a personal memo workspace for **iOS and macOS**, built with **Flutter** and
+**IdeaDots** (formerly Ideaholder and the working name ToDoDesk; Korean display name open, Q13) is a personal memo workspace for **iOS and macOS**, built with **Flutter** and
 **Supabase**. It **looks like a messenger but behaves like a sortable memo list**: memos, tasks,
 links, files and section separators live in swipeable groups, and each item can be moved,
 restyled, collapsed, replied to, merged and given an alarm. On the Mac it runs as a tall,
 phone-shaped window kept open beside other work.
 
-Status (2026-09-26): planning complete, no app code yet. **Next step: P0 (setup + technical
-spike).**
+Status (2026-09-28): P0 (repository and tooling) done: empty Flutter app with CI. **Next step: P1
+(technical spike).**
 
 ## Read first, in this order
 
-1. `docs/PLAN.md` (v1.6): the **single source of truth**. Decision log, feature spec, data model,
+1. `docs/PLAN.md` (v1.7): the **single source of truth**. Decision log, feature spec, data model,
    roadmap, open questions.
 2. Screen spec canvas: https://claude.ai/artifact/2jiaiT6JmJ8nQ87HCbFCgN (boards A–L, every control
    numbered and described). Read it with the Artifact tool (`action: "read"`), not a web fetch.
 3. `design/tokens.json`: themes and scales. The only place colors, fonts and sizes come from.
-4. `docs/Ideaholder_Implementation_Plan_v1.6.md`: the **execution roadmap** — start at Phase 0 → Task 0.1
+4. `docs/IdeaDots_Implementation_Plan_v1.7.md`: the **execution roadmap** — start at Phase 0 → Task 0.1
    and work sequentially; do not skip checkpoints; tasks marked `Confirm: yes` wait for the owner.
+5. `docs/MONETIZATION_PLAN.md`: plans and limits (Free 5 groups, 1,000 items/group, 500 MB; 7-day
+   reverse trial; Pro 20 GB; iOS banner + occasional interstitial; Mac house ads only), downgrade rules, ad rules, `plan_limits` schema. Read before P4 and P16;
+   it overrides older limit values in the implementation plan.
 
 If the plan and the canvas disagree, the plan wins; fix the canvas.
 `docs/SESSION_HANDOFF.md` and `docs/archive/` are history only.
@@ -77,7 +80,7 @@ extensible, but ship only these two).
   `upload-intent`, `unfurl`, `delete-account`, `revenuecat-webhook`).
 - Alarms: `flutter_local_notifications` + `timezone` (local notifications on every device).
 - Quick capture: iOS WidgetKit extension (Swift) + `home_widget` + `app_links` deep link
-  `ideaholder://capture`; macOS `hotkey_manager` (⌥Space) + `tray_manager` popover.
+  `ideadots://capture`; macOS `hotkey_manager` (⌥Space) + `tray_manager` popover.
 - Mac window: `window_manager` (400×760 default, 340×560 min, 520 max width). No keep-on-top.
 - Full package list: `docs/PLAN.md` §10.4. Check current versions and platform support before
   adding a package.
@@ -95,7 +98,7 @@ lib/
     auth/ groups/ items/ sections/ replies/ selection/ alarms/
     capture/ attachments/ search/ export/ settings/ billing/ mac_window/
   l10n/           app_en.arb, app_ko.arb
-ios/IdeaholderWidgets/   WidgetKit extension (Home/Lock Screen widgets, Control)
+ios/IdeaDotsWidgets/   WidgetKit extension (Home/Lock Screen widgets, Control)
 supabase/
   migrations/     SQL schema, RLS, triggers, functions (one file per change)
   functions/      Edge Functions (TypeScript/Deno)
@@ -107,6 +110,11 @@ docs/ design/     plan, tokens (already here)
 - **Language:** code, comments, docs, commit messages and canvas content in **English**. Report
   progress to the owner in **Korean**. App UI strings live in ARB files (Korean and English); no
   hard-coded user-facing strings.
+- **More languages later (D28, PLAN §10.5):** adding a language must stay a data change. Never
+  hard-code a locale list (use `AppLocalizations.supportedLocales`), never concatenate strings (ICU
+  placeholders/plurals), use `EdgeInsetsDirectional`/`start`/`end` instead of left/right, format
+  dates, times, numbers and sizes with `intl` and the active locale, and keep `CFBundleLocalizations`
+  in both `Info.plist` files in sync with the ARB files (a test checks key parity).
 - **Colors and fonts:** only from the theme extension generated from `design/tokens.json`. Adding a
   theme = adding a registry entry; never branch on theme names in widgets.
 - **Schema changes:** new migration file in `supabase/migrations/`; never edit an applied one.
@@ -136,17 +144,18 @@ supabase functions serve
 
 ## Git and safety
 
-- This folder is its **own git repository** (decision D19, 2026-09-27): run `git init` here in P0.
+- This folder is its **own git repository** (D19); remote `origin` = https://github.com/lady-m23/IdeaDots
+  (private). CI (GitHub Actions, macOS) runs on pushes to `main` and on pull requests.
   The surrounding home folder is a separate repository; never commit from it.
 - Commit or push **only when the owner asks**.
-- `/Users/leonie/Projects/003 TaskHolder_desktop` is **read-only**; Ideaholder is a separate project.
+- `/Users/leonie/Projects/003 TaskHolder_desktop` is **read-only**; IdeaDots is a separate project.
 - Never commit secrets (`.env`, Supabase keys, AdMob/RevenueCat keys, signing files).
 
 ## Open questions (defaults apply until answered)
 
-See `docs/PLAN.md` §14: email password option (Q1), Free storage size (Q2), Mac distribution (Q3),
-Supabase organization (Q4), storage backend / egress (Q5, decide before P2), Free search limit
-(Q6), pricing (Q7), Korean fonts (Q8).
+See `docs/PLAN.md` §14: storage backend / egress (Q5), pricing (Q7), Korean fonts (Q8), Free items
+per group (Q10), Pro storage (Q11), Korean display name (Q13). Q1–Q4, Q6, Q9 (500 MB) and Q12
+(interstitials on) are resolved (§2.7, §2.8).
 
 ## P0 checklist
 

@@ -1,4 +1,4 @@
-# Static analysis for Ideaholder. `flutter analyze` must report zero issues.
+# Static analysis for IdeaDots. `flutter analyze` must report zero issues.
 include: package:flutter_lints/flutter.yaml
 
 analyzer:

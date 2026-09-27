@@ -11,5 +11,5 @@ import 'env.dart';
 void bootstrap() {
   WidgetsFlutterBinding.ensureInitialized();
   Env.fromDefines();
-  runApp(const ProviderScope(child: IdeaholderApp()));
+  runApp(const ProviderScope(child: IdeaDotsApp()));
 }

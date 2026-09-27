@@ -4,3 +4,5 @@ output-dir: lib/l10n/generated
 output-localization-file: app_localizations.dart
 output-class: AppLocalizations
 nullable-getter: false
+# Keys missing from a non-template ARB file are listed here after `flutter gen-l10n`.
+untranslated-messages-file: build/l10n_untranslated.json

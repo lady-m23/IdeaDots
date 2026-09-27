@@ -1,13 +1,14 @@
-# Ideaholder — Implementation Plan v1.6
+# IdeaDots — Implementation Plan v1.7
 
-**File:** `Ideaholder_Implementation_Plan_v1.6.md` (the product is **Ideaholder**, formerly the working name ToDoDesk)
+**File:** `IdeaDots_Implementation_Plan_v1.7.md` (the product is **IdeaDots**, formerly Ideaholder and the working name ToDoDesk)
 **Date:** 2026-09-27 · **Status:** ready for execution · **Audience:** an AI coding agent (Claude Code) executing one phase at a time, and the owner reviewing checkpoints.
 
 Sources of truth, in priority order:
-1. `docs/PLAN.md` v1.6 — product and technical specification (every `§` reference below points there).
+1. `docs/PLAN.md` v1.7 — product and technical specification (every `§` reference below points there).
 2. Screen spec canvas — https://claude.ai/artifact/2jiaiT6JmJ8nQ87HCbFCgN (boards A–L; each control is numbered and described).
 3. The owner's answers collected on 2026-09-27 (§2.7 of the plan, repeated in section 2 below).
 4. `CLAUDE.md` (working rules) and `design/tokens.json` v1.2 (all colors, scales, brand values).
+5. `docs/MONETIZATION_PLAN.md` (2026-09-28) — plans, limits, reverse trial, downgrade, ads, schema for P4/P16. **Updated after v1.6; wherever it and the older lines below differ, it wins** (PLAN.md v1.7 §2.8 records the decisions).
 
 If this document and `docs/PLAN.md` ever disagree, `docs/PLAN.md` wins and this document must be corrected.
 
@@ -35,9 +36,9 @@ If this document and `docs/PLAN.md` ever disagree, `docs/PLAN.md` wins and this 
 | A3 | Online-only: the server is the only source of truth. The app keeps a read-only display cache (last ~50 items per group) plus one small local file for drafts and the text send queue. No local database, no sync engine. | §6 |
 | A4 | Single user per account; no sharing or collaboration in v1. | §3.2 |
 | A5 | A signed-in device stays signed in until an explicit sign-out, device revoke, account deletion, or a rejected refresh token. | §5.5 |
-| A6 | Free plan: 10 groups, 500 MB, 10 MB/file, banner ad, 90-day search. Pro: unlimited groups, 30 GB, 200 MB/file, no ads, full search. | §7, §9 |
+| A6 | Free plan: 5 groups, 1,000 items per group, 500 MB, 10 MB/file, ads (iOS: banner + occasional interstitial; Mac: house banner + house interstitial, no third-party SDK), full search. 7-day Pro reverse trial at first sign-in. Pro: unlimited, 20 GB, 200 MB/file, no ads. No lifetime purchase. (M1–M9, Q10–Q11) | §7, §9, MONETIZATION_PLAN |
 | A7 | Two release themes (Paper, Dark) from a registry that accepts more themes later without a data migration. Inside a group, accents follow the group's color family; elsewhere the app accent. | §11 |
-| A8 | Korean is the launch market; every user-facing string exists in Korean and English from the first screen. | §9.4 |
+| A8 | Korean is the launch market; every user-facing string exists in Korean and English from the first screen. Further languages are added per launch country as data (ARB file + `Info.plist` code + fonts + store copy), never as code changes. | §10.5, D28 |
 | A9 | Target device class for performance: iPhone 12, 10,000 items per group at 60 fps, first paint < 300 ms from cache. | §6.9 |
 | A10 | The first release ships without tags, AI, a large writing mode, video attachments, swipe-to-delete, keep-on-top, pinned memos, or nested replies. | §3.2 |
 
@@ -51,7 +52,7 @@ All of PLAN §2 applies. The ones that most shape the build, grouped:
 - B1–B6: Flutter; no E2EE; online-only; quotas + ads on Free; tall Mac window; header / list / input bar / banner structure.
 - C1–C3: no timestamps, no auto date separators; manual `--date` / `--text` separators with collapsible sections; sortable memo list (reorder, style, important).
 - C4/C5: `[]` task syntax stays; the input bar's task toggle became the **alarm bell**; memo alarms with toasts on iOS and macOS.
-- C6–C9: Free keeps 10 groups; Paper + Dark only (extensible); the fixed-items bar shows only alarmed memos; no video attachments.
+- C6–C9: Free keeps 10 groups (superseded by M2: 5 groups); Paper + Dark only (extensible); the fixed-items bar shows only alarmed memos; no video attachments.
 - C10/C11: P1 = quick-entry widget, draft preservation, multi-select (move/delete/merge), collapsible replies; out: large-text mode, tags, AI.
 
 **UI decisions (2026-09-27)**
@@ -60,20 +61,24 @@ All of PLAN §2 applies. The ones that most shape the build, grouped:
 - D3/D7 Ten group color families (Red, Orange (coral), Yellow, Green, Teal, Sky, Blue, Violet, Pink, Graphite); memo colors are five shade levels of the group's family; group recolor remaps memos.
 - D4/D5 Empty "Nothing here yet +" page after the last group and for new accounts; the reorder page shows no group count.
 - D8–D11 Accents inside a group use the group color (Paper: actions level 2, marks level 1; Dark: level 4); app accent deep orange elsewhere; no black filled buttons except Sign in with Apple; quiet `+` on the empty page.
-- D12–D15 Name **Ideaholder**; stay signed in; app icon **C1** (clipboard + three typing dots; the same dots are the only loading indicator); sign-in screen layout **S4**, opening in the device appearance before the first sign-in and in the last in-app choice after a sign-out.
+- D12–D15 Name (now **IdeaDots**, D27); stay signed in; app icon **C1** (clipboard + three typing dots; the same dots are the only loading indicator); sign-in screen layout **S4**, opening in the device appearance before the first sign-in and in the last in-app choice after a sign-out.
 - D16 Quick capture: **Write memo** and **Take photo** everywhere (widgets, Lock Screen, Control Center, capture sheet, Mac popover); a photo is an ordinary image item with an optional caption.
 - D17 **No swipe-to-delete and no single-item Delete**; items are deleted only via multi-select → Delete → 5 s Undo.
 - D18 Completed tasks: checkbox filled in the group action color + strikethrough, muted text, same place.
 
 **Decisions collected on 2026-09-27**
-- D19 Own git repository in `/Users/leonie/Projects/004 Ideaholder` (formerly `008 Draftboard`).
+- D19 Own git repository in `/Users/leonie/Projects/004 IdeaDots` (formerly `004 Ideaholder`, `008 Draftboard`); remote https://github.com/lady-m23/IdeaDots (private).
 - D20 Supabase: same organization as TaskHolder, **new project**, region **Seoul (ap-northeast-2)**.
 - D21 Email sign-in = 6-digit code only (external transactional email sender).
 - D22 Mac deletes only through selection (⌫ or toolbar); no Delete in the right-click menu.
-- D23 Free limits 500 MB / 10 MB per file.
+- D23 Free limits 500 MB / 10 MB per file (confirmed on 2026-09-28, M6).
+- M1–M5 (2026-09-28): 7-day Pro reverse trial at first sign-in; Free 5 groups; no lifetime purchase; ads on Free only; 90-day search window dropped (see `docs/MONETIZATION_PLAN.md`).
+- M6–M9 (2026-09-28): Free storage 500 MB; iOS Free interstitials on from launch (kill switch, 10% holdout); macOS house ads only (house banner + house interstitial, no third-party SDK); Android/Windows later follow iOS.
 - D24 Quick-capture photo while offline is **not saved** (Send disabled with a reason); memo text still queues.
 - D25 Separator deletion stays in the separator menu (two confirmed actions); memos remain multi-select only.
 - D26 Mac App Store only (sandboxed, universal purchase).
+- D27 (2026-09-28) App name **IdeaDots**: package `ideadots`, bundle ids `com.<owner>.ideadots` (+ `.widgets`), deep links `ideadots://`, widget target `IdeaDotsWidgets`.
+- D28 (2026-09-28) Languages are added per launch country as data (PLAN §10.5); launch with Korean and English.
 
 **Implementation defaults (PLAN §2.8, I1–I11)**: 20,000-char item limit, fold after 12 lines; due alarms stay until cleared; alarms ring on every device; a dragged separator moves its section; one-level replies collapsed by default; drafts and the outbox in one local JSON file; memo colors stored as shade levels; Markdown export rules; horizontal drags only page; no auto-created group ("Inbox" is created by the first quick capture when no group exists); image captions allowed.
 
@@ -84,8 +89,12 @@ All of PLAN §2 applies. The ones that most shape the build, grouped:
 | # | Topic | Resolution used by this plan | Phase where it matters | Change window |
 |---|---|---|---|---|
 | Q5 | File storage backend (Supabase Storage vs Cloudflare R2 for egress cost) | Supabase Storage; the storage client sits behind one `AttachmentStore` interface so R2 can replace it | P11 (attachments), decide before P16 | Until P16 starts |
-| Q6 | Free search window (90 days) | Keep 90 days, implemented server-side by `created_at` | P14 | Until P14 |
-| Q7 | Pricing and 7-day Mac trial | ₩2,900 / ₩24,000, $2.49 / $19.99, trial on first Mac sign-in | P16 (store products) | Until products are created in App Store Connect |
+| Q6 | Free search window | **Resolved (M5):** dropped; full history on every plan | P14 | — |
+| Q7 | Pricing | ₩2,900 / ₩24,000, $2.49 / $19.99; no introductory offer (reverse trial M1 instead) | P16 (store products) | Until products are created in App Store Connect |
+| Q9 | Free storage | **Resolved (M6):** 500 MB | P4 | — |
+| Q10–Q11 | Free 1,000 items/group, Pro 20 GB | Seeded in `plan_limits`; an answer only changes seed values | P4 | Until P16 |
+| Q12 | Interstitial ads | **Resolved (M7, M8):** on from launch on iOS (AdMob) and macOS (house card); `app_config` kill switch, 10% holdout | P16 | Any time (remote flag) |
+| Q13 | Korean display name | "IdeaDots" in both languages (ARB `appTitle`) | P15/P18 | Until the store listing is written |
 | Q8 | Korean fonts | Pretendard (body) + Noto Serif KR (Paper titles) as fallbacks; verify licence + bundle size in P2 | P2 | Until P2 |
 | I11 | Photo captions | Allowed, plain text in `items.body` | P11/P12 | Until P11 |
 | — | Everything under "Deferred" (section 8) | Not built; seams noted per task | — | Post-MVP |
@@ -108,7 +117,7 @@ Every screen the MVP must ship, with the numbered controls to honor. Implement e
 | **F** | Memo alarms | Bell → picker (In 1 hour / This evening / Tomorrow / Custom) → pending chip; due: in-app toast (Open, Clear) or system notification; alarm bar expanded list with Due first; permission pre-prompt. |
 | **G** | Multi-select | Enter via item menu → Select (pre-selects) or Mac click/⌘/⇧-click; toolbar Move · Merge · Delete · Done; Merge preview and rules; Move destination picker (group → section). **The only delete path.** |
 | **H** | Quick capture | Medium widget with **Write memo** + **Take photo**; small widget one action; Lock Screen + Control Center one per action; capture sheet (memo mode) with camera button (8); photo mode: camera → preview with Retake (9), compressed preview (10), optional caption (11), Send; Mac ⌥Space popover with bell + camera. |
-| **I** | Search | Scope This group / All groups; filters All · Open tasks · Links · Files · Images; results show group dot + section title; Free 90-day notice; app accent. |
+| **I** | Search | Scope This group / All groups; filters All · Open tasks · Links · Files · Images; results show group dot + section title; full history on every plan (M5; remove the 90-day notice from board I); app accent. |
 | **J** | Sign-in (S4) & QR | Centered C1 tile, name, tagline; Apple (black/white), Google, email outlined; opens in the user's appearance (9); email code screen; Mac window with QR; iPhone approve sheet. |
 | **K** | Settings | Account · Plan · Storage · Appearance (Paper/Dark/System, text size) · Alarms & notifications · Quick capture target · Devices (Sign in on Mac, signed-in devices) · Privacy & legal · Sign out · Delete account. Mac adds hotkey, menu bar icon, launch at login. |
 | **L** | Attachments & states | Attach sheet (Photos · Camera · Files, no video notice, storage meter); offline strip, Sending / Not sent, Draft restored, attach disabled offline; storage full notice; first group tip cards. |
@@ -121,7 +130,7 @@ Every screen the MVP must ship, with the numbered controls to honor. Implement e
 |---|---|---|---|
 | FR-01 | Sign in with Apple, Google, email code; stay signed in; sign-out semantics; devices list | §5.2–5.6 | P5, P15 |
 | FR-02 | QR login Mac ← iPhone | §5.3 | P17 |
-| FR-03 | Groups: create (header `+`, empty page), rename, color (10 families), reorder, delete, 10-group Free limit, empty page | §4.1 | P6 |
+| FR-03 | Groups: create (header `+`, empty page), rename, color (10 families), reorder, delete, 5-group Free limit (M2), 1,000 items per group (Q10), paused groups, empty page | §4.1 | P6 (limits), P16 (paused/downgrade) |
 | FR-04 | Items: text, task, link, file, image, separator; input syntax; 20,000-char limit; folding | §4.2 | P7, P8, P11 |
 | FR-05 | Sections: separators, collapse state synced, separator menu incl. deletion | §4.3 | P7, P9 |
 | FR-06 | Ordering: fractional `position`, drag-to-reorder, move to group/section, sections move whole | §4.4, §6.2 | P9 |
@@ -132,7 +141,7 @@ Every screen the MVP must ship, with the numbered controls to honor. Implement e
 | FR-11 | Memo alarms: set/edit/clear, local notifications on every device, toast, alarm bar, Due state | §4.8, §4.9, §6.6 | P10 |
 | FR-12 | Attachments: quotas, no video, compression, thumbnails, TUS > 6 MB, upload progress | §4.10, §7 | P11 |
 | FR-13 | Link previews via `unfurl` with SSRF guards | §4.11 | P11 |
-| FR-14 | Search (pg_trgm), scopes, filters, 90-day Free limit | §4.12 | P14 |
+| FR-14 | Search (pg_trgm), scopes, filters, full history on every plan (M5) | §4.12 | P14 |
 | FR-15 | Markdown export | §4.13 | P3, P14 |
 | FR-16 | Quick capture: memo and photo, widgets, controls, capture sheet, Mac popover | §4.14 | P12 |
 | FR-17 | Draft preservation and text send queue in a local file | §4.15, §4.16 | P8 |
@@ -142,7 +151,7 @@ Every screen the MVP must ship, with the numbered controls to honor. Implement e
 | FR-21 | Themes and color roles; C1 icon; three-dot loading indicator | §11 | P2 |
 | FR-22 | Ads: AdMob banner (iOS, Free), house banner (Mac), UMP | §8 | P16 |
 | FR-23 | Pro subscription via RevenueCat; entitlements; quotas by plan | §9 | P16 |
-| FR-24 | Localization ko/en; accessibility; performance targets | §6.9, §9.4 | P18 |
+| FR-24 | Localization ko/en at launch, extensible to more languages as data (ARB parity test, `CFBundleLocalizations`, directional layout, `intl` formats); accessibility; performance targets | §6.9, §10.5 | P0 (setup), P18 |
 
 ---
 
@@ -168,7 +177,7 @@ All colors come from `design/tokens.json` → generated Dart. Group role levels:
 
 ## 7. MVP scope boundaries
 
-**In:** everything in PLAN §3.1 as refined by D1–D26. **Out (do not build, do not stub UI for):** tags, AI, large writing mode, video attachments, swipe-to-delete, single-item delete, keep-on-top, pinned memos, nested replies, repeating alarms, APNs alarms, share extension, Mac widget, export with files, Android/Windows/web, shared groups, offline database, E2EE, rich text rendering.
+**In:** everything in PLAN §3.1 as refined by D1–D28 and M1–M9. **Out (do not build, do not stub UI for):** tags, AI, large writing mode, video attachments, swipe-to-delete, single-item delete, keep-on-top, pinned memos, nested replies, repeating alarms, APNs alarms, share extension, Mac widget, export with files, Android/Windows/web, shared groups, offline database, E2EE, rich text rendering.
 
 ## 8. Deferred features and the seams left for them
 
@@ -213,12 +222,12 @@ After the phase that introduces each, re-verify at every later checkpoint:
 
 | Input | Needed by |
 |---|---|
-| Apple Developer team ID; bundle ids (`com.<owner>.ideaholder`, `.widgets`), App Group id (`group.<bundle>`), URL scheme `ideaholder` | P0 |
+| Apple Developer team ID; bundle ids (`com.<owner>.ideadots`, `.widgets`), App Group id (`group.<bundle>`), URL scheme `ideadots` | P0 |
 | Supabase project (created by the owner in the TaskHolder organization, Seoul), project URL and anon key; service role key only for the CLI/Edge Functions | P4 |
 | Transactional email sender (Resend or similar) API key and a sending domain for OTP mails | P5 |
 | Google Cloud OAuth client ids (iOS, macOS, web) for Google sign-in; Sign in with Apple service configured in the developer portal | P5 |
-| AdMob app id + banner unit id (iOS); UMP setup | P16 |
-| RevenueCat project + App Store Connect products (`pro_monthly`, `pro_yearly`, trial offer) | P16 |
+| AdMob app id + banner and interstitial unit ids (iOS); UMP setup | P16 |
+| RevenueCat project + App Store Connect products (`pro_monthly`, `pro_yearly`, **no** introductory offer); privacy-policy line about the trial ledger | P16 |
 | Privacy policy and terms URLs; support email | P15 |
 | Store assets: name, subtitle, screenshots (KR/EN), 1024 px icon export | P19 |
 
@@ -257,7 +266,7 @@ Estimated duration for one developer: 15–17 weeks (PLAN §13). Phases 0–4 ar
 Goal: a clean, buildable Flutter project in its own repository with the folder layout from `CLAUDE.md`, CI, and the secrets policy in place. No product code yet.
 
 ### Task 0.1 — Own git repository (D19)
-- **Objective:** make `/Users/leonie/Projects/004 Ideaholder` (formerly `008 Draftboard`) an independent repository.
+- **Objective:** make `/Users/leonie/Projects/004 IdeaDots` (formerly `004 Ideaholder`, `008 Draftboard`) an independent repository.
 - **Scope:** `git init`, `.gitignore` (Flutter, macOS, iOS, `.env*`, `supabase/.temp`, `*.keystore`, `build/`), first commit of the existing docs and tokens.
 - **Subtasks:** (1) `git init` in the folder; verify the parent repo no longer tracks it (`git -C ~ status` shows the folder as untracked/ignored; add it to the parent's `.gitignore` only if the owner agrees). (2) Write `.gitignore`. (3) Commit `docs/`, `design/`, `CLAUDE.md`, this plan. (4) Add `README.md` (two paragraphs: what the app is, how to run).
 - **Acceptance:** `git log` shows one commit; `git status` clean; the parent repository is untouched.
@@ -267,10 +276,10 @@ Goal: a clean, buildable Flutter project in its own repository with the folder l
 
 ### Task 0.2 — Flutter project and folder layout
 - **Objective:** create the app skeleton exactly as `CLAUDE.md` describes.
-- **Scope:** `flutter create --platforms=ios,macos --org <owner-org> ideaholder` at the repo root (project name `ideaholder`, bundle ids from section 11), then the `lib/` layout: `app/` (router, bootstrap, theme, l10n), `core/` (supabase client, logic, storage, notifications), `features/*`, `l10n/` (ARB), `test/`, `integration_test/`.
+- **Scope:** `flutter create --platforms=ios,macos --org <owner-org> ideadots` at the repo root (project name `ideadots`, bundle ids from section 11), then the `lib/` layout: `app/` (router, bootstrap, theme, l10n), `core/` (supabase client, logic, storage, notifications), `features/*`, `l10n/` (ARB), `test/`, `integration_test/`.
 - **Subtasks:** (1) Generate the project; set iOS deployment target 17.0, macOS 13.0. (2) Add dependencies with pinned versions: `flutter_riverpod`, `go_router`, `supabase_flutter`, `flutter_secure_storage`, `path_provider`, `shared_preferences`, `intl`, `flutter_localizations`; dev: `flutter_lints`, `mocktail`, `golden_toolkit` (or `alchemist`). Other packages are added in the phase that uses them. (3) Configure `l10n.yaml` with `app_en.arb` as template and `app_ko.arb`. (4) Create empty feature folders with a `README.md` line each stating ownership. (5) `analysis_options.yaml`: `flutter_lints` + `prefer_const_constructors`, `avoid_print`, `require_trailing_commas`.
-- **Acceptance:** `flutter run -d macos` and `flutter run -d ios` (simulator) show a blank scaffold titled "Ideaholder"; `flutter analyze` clean.
-- **Tests:** the default widget test replaced by a smoke test that pumps `IdeaholderApp` and finds the scaffold.
+- **Acceptance:** `flutter run -d macos` and `flutter run -d ios` (simulator) show a blank scaffold titled "IdeaDots"; `flutter analyze` clean.
+- **Tests:** the default widget test replaced by a smoke test that pumps `IdeaDotsApp` and finds the scaffold.
 - **Regression risks:** none.
 - **Confirm:** yes — bundle ids, org and App Group id must come from the owner before running `flutter create`.
 
@@ -317,7 +326,7 @@ Goal: answer every high-risk platform question **before** feature code, in a thr
 - **Confirm:** no.
 
 ### Task 1.5 — WidgetKit widget + deep-link cold start into capture and camera (risks 6, 14)
-- **Scope:** a Swift WidgetKit extension with one small widget showing a button opening `ideaholder://capture`, a second with `?mode=photo`; `app_links` handling; on cold start route straight to a placeholder sheet or straight to `image_picker` camera; measure time from tap to keyboard/camera visible. App Group shared string for the group name via `home_widget`.
+- **Scope:** a Swift WidgetKit extension with one small widget showing a button opening `ideadots://capture`, a second with `?mode=photo`; `app_links` handling; on cold start route straight to a placeholder sheet or straight to `image_picker` camera; measure time from tap to keyboard/camera visible. App Group shared string for the group name via `home_widget`.
 - **Acceptance:** both links work from cold start; timings recorded; camera permission flow observed; denied permission falls back to the sheet.
 - **Confirm:** no.
 
@@ -352,12 +361,12 @@ Goal: answer every high-risk platform question **before** feature code, in a thr
 
 ### Task 2.3 — Typography and Korean fonts (Q8)
 - **Scope:** bundle Fraunces (Paper display), Instrument Sans (Paper body), IBM Plex Sans + IBM Plex Sans KR (Dark), IBM Plex Mono, Pretendard (Korean body fallback), Noto Serif KR (Paper title fallback); `TextTheme` with fallback families; check licences (OFL / Pretendard SIL) and record bundle size in `docs/SPIKE_REPORT.md` appendix.
-- **Acceptance:** "Ideaholder 아이디어" renders with the intended Latin and Hangul faces in both themes; total font payload noted (< 3 MB target, otherwise subset).
+- **Acceptance:** "IdeaDots 아이디어" renders with the intended Latin and Hangul faces in both themes; total font payload noted (< 3 MB target, otherwise subset).
 - **Tests:** golden of a text sample per theme.
 - **Confirm:** no (fonts can be swapped later without code changes beyond the theme file).
 
 ### Task 2.4 — Brand assets: C1 icon and loading dots (§11.6)
-- **Scope:** `design/brand/ideaholder-mark.svg` (120-grid mark from §11.6); exported app icons: iOS 1024 (light, dark, tinted), macOS icon set; macOS menu bar template PNGs (16/32 @1x/2x); `LoadingDots` widget (three dots, 1.2 s cycle, 0.2 s stagger, opacity 0.25→1, static 1/0.65/0.35 under Reduce Motion, color = `GroupPalette.action` or accent); `LaunchScreen` storyboard with the mark on cream/dark.
+- **Scope:** `design/brand/ideadots-mark.svg` (120-grid mark from §11.6); exported app icons: iOS 1024 (light, dark, tinted), macOS icon set; macOS menu bar template PNGs (16/32 @1x/2x); `LoadingDots` widget (three dots, 1.2 s cycle, 0.2 s stagger, opacity 0.25→1, static 1/0.65/0.35 under Reduce Motion, color = `GroupPalette.action` or accent); `LaunchScreen` storyboard with the mark on cream/dark.
 - **Acceptance:** icons visible on both home/dock; `LoadingDots` animates and respects `MediaQuery.disableAnimations`.
 - **Tests:** widget test that `LoadingDots` renders three children and stops under reduced motion.
 - **Confirm:** no.
@@ -411,9 +420,9 @@ All modules here are platform-free Dart with exhaustive unit tests. Nothing in t
 Prerequisite: the owner creates the Supabase project (D20: TaskHolder organization, new project, Seoul) and shares the URL/anon key; the CLI is linked with `supabase link`. Everything below is written as migrations in `supabase/migrations/` and applied locally first (`supabase start`, `supabase db reset`).
 
 ### Task 4.1 — Schema migration `0001_core.sql` (§6.1)
-- **Scope:** extensions `pgcrypto`, `pg_trgm`; tables `groups`, `items`, `attachments`, `link_previews`, `usage`, `entitlements`, `qr_login_requests`, `devices` with the constraints in §6.1 (body length, separator rules, one-level replies trigger, groups-per-user ≤ `entitlements.max_groups`); indexes `items (group_id, parent_id, position) where deleted_at is null`, alarm partial index, `GIN (body gin_trgm_ops)`; `updated_at` trigger; default `entitlements` row on user creation (Free: 500 MB, 10 MB, 10 groups, ads true — D23).
+- **Scope:** extensions `pgcrypto`, `pg_trgm`; tables `groups` (+ `paused`, `item_count`), `items`, `attachments`, `link_previews`, `usage`, `entitlements`, `plan_limits`, `trial_ledger`, `app_config`, `qr_login_requests`, `devices` with the constraints in §6.1 and MONETIZATION_PLAN §8 (body length, separator rules, one-level replies trigger, `effective_plan()`, active groups ≤ `plan_limits.max_groups`, items per group ≤ `max_items_per_group`); indexes `items (group_id, parent_id, position) where deleted_at is null`, alarm partial index, `GIN (body gin_trgm_ops)`; `updated_at` trigger; default `entitlements` row on user creation (no trial yet; `start_trial()` arrives in P16); `plan_limits` seeded: free (5 groups, 1,000 items/group, 500 MB, 10 MB, 50 MB/day, trash 7, ads) · trial and pro (unlimited groups, guard 50,000 items/group, 20 GB, 200 MB, 2 GB/day, trash 30, no ads).
 - **Acceptance:** `supabase db reset` applies cleanly; `supabase gen types dart` (or hand-written models) match.
-- **Tests:** SQL tests in `supabase/tests/` (pgTAP): constraints reject bad rows; the reply-depth trigger fires; the 11th group on Free is rejected.
+- **Tests:** SQL tests in `supabase/tests/` (pgTAP): constraints reject bad rows; the reply-depth trigger fires; the 6th group and the 1,001st item on Free are rejected; a separator is accepted at the item cap.
 - **Confirm:** yes — project creation and linking use the owner's account.
 
 ### Task 4.2 — Row Level Security `0002_rls.sql` (§5.4)
@@ -456,7 +465,7 @@ Prerequisite: the owner creates the Supabase project (D20: TaskHolder organizati
 - **Confirm:** yes — Supabase Auth settings are changed in the owner's project.
 
 ### Task 5.2 — Sign-in screen S4 (board J1, §5.6)
-- **Scope:** `features/auth/sign_in_screen.dart`: centered C1 tile, "Ideaholder", tagline (ko/en), Apple (black in Paper, white in Dark, Apple's button rules), Google and email outlined, terms line; opens in the device appearance before the first sign-in, then in the stored app choice; pressed button shows `LoadingDots`. Mac window variant (J3) without the QR part yet (P17 adds it).
+- **Scope:** `features/auth/sign_in_screen.dart`: centered C1 tile, "IdeaDots", tagline (ko/en), Apple (black in Paper, white in Dark, Apple's button rules), Google and email outlined, terms line; opens in the device appearance before the first sign-in, then in the stored app choice; pressed button shows `LoadingDots`. Mac window variant (J3) without the QR part yet (P17 adds it).
 - **Acceptance:** goldens Paper/Dark match board J; theme rule verified by toggling system appearance.
 - **Confirm:** no.
 
@@ -479,12 +488,12 @@ Prerequisite: the owner creates the Supabase project (D20: TaskHolder organizati
 ## Phase 6 — App shell and groups (§4.1, boards A header, C)
 
 ### Task 6.1 — Router and shell
-- **Scope:** `go_router` routes: `/` (groups pager), `/settings`, `/search`, `/capture` (P12), deep-link handler for `ideaholder://…`; `HomeShell` = `PageView` of group pages + the trailing empty page; horizontal drag anywhere pages (protected behavior 5); last group index remembered.
+- **Scope:** `go_router` routes: `/` (groups pager), `/settings`, `/search`, `/capture` (P12), deep-link handler for `ideadots://…`; `HomeShell` = `PageView` of group pages + the trailing empty page; horizontal drag anywhere pages (protected behavior 5); last group index remembered.
 - **Acceptance:** paging works with 0, 1 and 12 groups; the empty page is always last.
 - **Confirm:** no.
 
 ### Task 6.2 — Header, page dots, group title editing (board A 1–4)
-- **Scope:** `GroupHeader`: color dot + title (tap → inline `TextField`, Enter saves, Esc/outside cancels, 1–30 chars, empty not saved), `+` (creates a group to the right with title selected; Free 11th → Pro sheet stub that says "Pro" until P16), `…` menu (C1: Rename, Group color, Reorder groups, Search in group, Export as Markdown, Delete group, Settings); `PageDots` with the active dot in the group's `activeDot` color and a trailing `+` dot; > 8 groups → "3 / 12" counter.
+- **Scope:** `GroupHeader`: color dot + title (tap → inline `TextField`, Enter saves, Esc/outside cancels, 1–30 chars, empty not saved), `+` (creates a group to the right with title selected; Free 6th → Pro sheet stub that says "Pro" until P16), `…` menu (C1: Rename, Group color, Reorder groups, Search in group, Export as Markdown, Delete group, Settings); `PageDots` with the active dot in the group's `activeDot` color and a trailing `+` dot; > 8 groups → "3 / 12" counter.
 - **Data:** `groups` insert with next unused color starting from blue, `position` after last.
 - **Acceptance:** all menu entries route somewhere (search/export/settings may be placeholders until their phases); goldens for the header in three colors.
 - **Confirm:** no.
@@ -649,17 +658,17 @@ Prerequisite: the owner creates the Supabase project (D20: TaskHolder organizati
 
 ### Task 12.1 — Capture sheet: memo mode (board H2)
 - **Scope:** route `/capture`: full-screen sheet with target group chip (default from Settings: last used or fixed; "Inbox" is created if no group exists, I10), text field focused with keyboard up, bell, **camera button**, Send; own draft in `OutboxStore`; same parser; after Send close and return; cold start path measured (< 1.5 s target).
-- **Acceptance:** `ideaholder://capture` from a cold start shows the keyboard within the target time on an iPhone 12-class device.
+- **Acceptance:** `ideadots://capture` from a cold start shows the keyboard within the target time on an iPhone 12-class device.
 - **Confirm:** no.
 
 ### Task 12.2 — Capture sheet: photo mode (board H4, D16, D24)
-- **Scope:** `ideaholder://capture?mode=photo` or the camera button → system camera (`image_picker`, rear, stills) → preview (compressed size shown), Retake, Cancel, optional caption field (no syntax, I11), bell, Send → Task 11.2 pipeline as an image item with caption in `body`; storage full or **offline → Send disabled with the reason, nothing queued** (D24); camera permission pre-prompt; denied → memo mode with a hint.
+- **Scope:** `ideadots://capture?mode=photo` or the camera button → system camera (`image_picker`, rear, stills) → preview (compressed size shown), Retake, Cancel, optional caption field (no syntax, I11), bell, Send → Task 11.2 pipeline as an image item with caption in `body`; storage full or **offline → Send disabled with the reason, nothing queued** (D24); camera permission pre-prompt; denied → memo mode with a hint.
 - **Acceptance:** photo appears in the target group with its caption; offline attempt shows the exact message and saves nothing.
 - **Tests:** widget tests for the disabled states; manual camera flow.
 - **Confirm:** no.
 
 ### Task 12.3 — iOS widgets and controls (board H1)
-- **Scope:** Swift WidgetKit extension target `IdeaholderWidgets`: medium widget (mark, group name, **Write memo** in the group action color, **Take photo** outlined), small widget with a configurable action (App Intent parameter: memo | photo), Lock Screen accessory widgets (one per action), iOS 18 Control Center controls (one per action); group name and color id shared through the App Group via `home_widget`; deep links from Task 12.1/12.2.
+- **Scope:** Swift WidgetKit extension target `IdeaDotsWidgets`: medium widget (mark, group name, **Write memo** in the group action color, **Take photo** outlined), small widget with a configurable action (App Intent parameter: memo | photo), Lock Screen accessory widgets (one per action), iOS 18 Control Center controls (one per action); group name and color id shared through the App Group via `home_widget`; deep links from Task 12.1/12.2.
 - **Acceptance:** all entry points open the right mode; widget shows the current target group's name after a change (timeline reload on app background).
 - **Confirm:** yes — the App Group id and the extension's provisioning are the owner's.
 
@@ -680,7 +689,7 @@ Prerequisite: the owner creates the Supabase project (D20: TaskHolder organizati
 - **Confirm:** no.
 
 ### Task 13.2 — Tray icon and menu
-- **Scope:** `tray_manager` with the monochrome C1 template icon; click toggles the window; menu: Quick memo, Show Ideaholder, Settings, Quit.
+- **Scope:** `tray_manager` with the monochrome C1 template icon; click toggles the window; menu: Quick memo, Show IdeaDots, Settings, Quit.
 - **Confirm:** no.
 
 ### Task 13.3 — Keyboard shortcuts and hover affordances
@@ -695,7 +704,7 @@ Prerequisite: the owner creates the Supabase project (D20: TaskHolder organizati
 ## Phase 14 — Search and export (§4.12, §4.13, boards I, C1 5)
 
 ### Task 14.1 — Search screen
-- **Scope:** entry from group menu (scope This group) and ⌘F (All groups); 0.3 s debounce; filters All · Open tasks · Links · Files · Images ("Open tasks" works with an empty query); results with group dot + name + section title + kind, highlighted match; tap → `scrollToItem`; Free: last 90 days with the "n older results" notice (Q6); app accent (no group scope).
+- **Scope:** entry from group menu (scope This group) and ⌘F (All groups); 0.3 s debounce; filters All · Open tasks · Links · Files · Images ("Open tasks" works with an empty query); results with group dot + name + section title + kind, highlighted match; tap → `scrollToItem`; full history on every plan (M5); app accent (no group scope).
 - **Acceptance:** "견적" finds "견적서"; results jump correctly across groups.
 - **Confirm:** no.
 
@@ -730,20 +739,37 @@ Prerequisite: the owner creates the Supabase project (D20: TaskHolder organizati
 
 ## Phase 16 — Monetization (§7–§9, boards A 18, B 7, K 2)
 
+> Tasks 16.1–16.6 follow `docs/MONETIZATION_PLAN.md` §8–§9 (schema, RPCs, acceptance). Summary below.
+
 ### Task 16.1 — Entitlements and gating
-- **Scope:** `EntitlementsRepo` drives: group limit (10 → Pro sheet), quotas (500 MB / 10 MB vs 30 GB / 200 MB), search window, ad slot visibility, trash retention; a `ProSheet` explaining benefits and prices (Q7).
-- **Acceptance:** toggling the `entitlements` row locally flips every gate without restart.
+- **Scope:** `plan_limits`, `effective_plan(uid)`, insert triggers (active groups ≤ 5 on Free, items per group ≤ 1,000 excluding separators/trash, paused groups reject inserts); `EntitlementsRepo` exposes plan, limits and `trialDaysLeft`; gates: group `+` (6th → Pro sheet), full-group bar (counter from 900), quotas (500 MB / 10 MB / 50 MB per day vs 20 GB / 200 MB / 2 GB), ad slot, trash retention; `ProSheet` (Q7).
+- **Acceptance:** editing `plan_limits` or moving `trial_ends_at` into the past flips every gate without restart; pgTAP: 6th group rejected, 1,001st item rejected, separator accepted at the cap, paused group rejects inserts.
 - **Confirm:** no.
 
 ### Task 16.2 — Ads (iOS AdMob, Mac house banner)
-- **Scope:** `google_mobile_ads` anchored adaptive banner in the 50 pt slot under the input bar (≥ 8 pt gap + hairline), hidden while the keyboard is up, non-personalized by default, UMP consent flow for EEA/UK; Mac: rotating house banner (Pro pitch, tips) in the same slot; Pro removes the slot on both platforms.
-- **Acceptance:** test ads render on iOS; no banner on Pro; UMP form appears with an EEA debug geography.
+- **Scope:** `google_mobile_ads` anchored adaptive banner in the 50 pt slot under the input bar (≥ 8 pt gap + hairline), hidden while the keyboard is up, non-personalized by default, UMP consent flow for EEA/UK; Mac: rotating house banner (Pro pitch, tips, TaskHolder cross-promotion) in the same slot; Pro and the trial remove the slot on both platforms. The macOS target links no third-party ad SDK (M8).
+- **Acceptance:** test ads render on iOS; no banner on Pro or during the trial; UMP form appears with an EEA debug geography.
 - **Confirm:** yes — AdMob app/unit ids and UMP configuration are the owner's.
 
 ### Task 16.3 — RevenueCat subscription
-- **Scope:** `purchases_flutter` with products `pro_monthly` / `pro_yearly` (Q7), 7-day trial offer on first Mac sign-in (once, flag in `SharedPreferences` + server-side check), Restore purchases, `revenuecat-webhook` updating `entitlements`; Mac App Store universal purchase configuration.
+- **Scope:** `purchases_flutter` with products `pro_monthly` / `pro_yearly` (Q7), no introductory offer, Restore purchases, `revenuecat-webhook` writing `entitlements.pro_expires_at`; Mac App Store universal purchase configuration.
 - **Acceptance:** sandbox purchase on iPhone unlocks Pro on the Mac within a minute; restore works after reinstall.
 - **Confirm:** yes — App Store Connect products and RevenueCat keys are the owner's.
+
+### Task 16.4 — Reverse trial (M1)
+- **Scope:** `start_trial()` RPC (idempotent, checks `trial_ledger` keyed by `sha256(pepper ‖ Apple sub or email)`), called once after sign-in; welcome sheet; Settings → Plan "Pro 체험 · N일 남음"; one day-5 in-app notice; one local notification 24 h before the end only if notification permission already exists.
+- **Acceptance:** new account → 7-day trial; delete account + sign up again → no trial; purchase during the trial ends it; clock past the end → downgrade sheet.
+- **Confirm:** no (the pepper is a server secret; never commit it).
+
+### Task 16.5 — Downgrade flow
+- **Scope:** trial-ended sheet (what changes, Upgrade, Continue with Free); group picker when > 5 groups; paused-group lock chip + "Paused group" bar instead of the input bar; `set_active_groups(ids)` with the 24 h rule; default active set = 5 most recently opened; full-group and full-storage bars.
+- **Acceptance:** an account with 8 groups, 1,200 items in one group and 300 MB loses nothing and shows every rule of MONETIZATION_PLAN §4.2; upgrading unpauses everything immediately.
+- **Confirm:** no.
+
+### Task 16.6 — Interstitials (M7 iOS AdMob, M8 Mac house card)
+- **Scope:** `google_mobile_ads` interstitial on iOS; house interstitial card on macOS (bundled promo: Pro benefits, price, Upgrade, Not now); one `InterstitialGate` for both, enforcing MONETIZATION_PLAN §6.2 (allowed moments only, never in widget/capture/share/notification/deep-link sessions, 120 s after foreground, ≥ 180 min gap, ≤ 2/day, 3-day grace after the trial, skip if not loaded); reads `app_config` and `entitlements.ab_bucket`.
+- **Acceptance:** flag off → never shown; flag on → shown only at listed moments and within caps; never in a widget-opened session; never on Pro, during the trial or for the holdout; the Mac shows only the house card and its bundle contains no Google Mobile Ads framework.
+- **Confirm:** yes — the interstitial unit id is the owner's; the flag ships on (`pct` 90, M7).
 
 **Checkpoint P16:** purchase/restore/gating matrix in sandbox on both devices. Commit `P16: monetization`.
 
@@ -768,7 +794,7 @@ Prerequisite: the owner creates the Supabase project (D20: TaskHolder organizati
 ## Phase 18 — Localization, accessibility, performance, polish
 
 ### Task 18.1 — Localization completeness
-- **Scope:** every string in `app_en.arb` and `app_ko.arb` (lint: no hard-coded strings via `flutter_lints` + a custom test scanning `lib/` for quoted UI text); Korean copy reviewed by the owner; date/number formats via `intl`; App Store metadata drafts (P19).
+- **Scope:** every string in `app_en.arb` and `app_ko.arb` (lint: no hard-coded strings via `flutter_lints` + a custom test scanning `lib/` for quoted UI text); Korean copy reviewed by the owner; date/number formats via `intl`; directional layout audit (no left/right-only insets); `InfoPlist.xcstrings` and widget `.xcstrings` complete; the "adding a language" checklist of PLAN §10.5 dry-run with a pseudo-locale; App Store metadata drafts (P19).
 - **Confirm:** yes — owner reviews Korean copy.
 
 ### Task 18.2 — Accessibility
@@ -780,7 +806,7 @@ Prerequisite: the owner creates the Supabase project (D20: TaskHolder organizati
 - **Confirm:** no.
 
 ### Task 18.4 — First-run tips and empty states (board L4, L2/L3)
-- **Scope:** three tip cards after the first group is created (disappear after the first memo); all empty/error states from board L reviewed; Pro trial offer on first Mac sign-in.
+- **Scope:** three tip cards after the first group is created (disappear after the first memo); all empty/error states from board L reviewed; the reverse-trial welcome sheet appears after the first sign-in (16.4).
 - **Confirm:** no.
 
 **Checkpoint P18:** perf numbers recorded; accessibility audit checklist done; owner copy review. Commit `P18: polish`.
@@ -811,7 +837,7 @@ Prerequisite: the owner creates the Supabase project (D20: TaskHolder organizati
 - [ ] AdMob Test Mode **off**, UMP live; RevenueCat products live; universal purchase verified
 - [ ] Privacy policy and terms URLs live; privacy labels submitted; usage descriptions localized
 - [ ] Icons (light/dark/tinted, macOS), launch screen, menu bar template icon in place
-- [ ] Deep links `ideaholder://capture` and `?mode=photo` verified from widgets, Lock Screen and Control Center on a clean install
+- [ ] Deep links `ideadots://capture` and `?mode=photo` verified from widgets, Lock Screen and Control Center on a clean install
 - [ ] Sign-in matrix (Apple, Google, email code, QR) on both platforms; sign-out and reinstall behavior verified
 - [ ] Alarms verified with the app closed on both platforms; permission-denied path verified
 - [ ] Account deletion verified against production (test account)

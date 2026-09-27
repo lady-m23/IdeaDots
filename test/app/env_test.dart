@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ideaholder/app/env.dart';
+import 'package:ideadots/app/env.dart';
 
 void main() {
   const url = 'https://abc.supabase.co';
