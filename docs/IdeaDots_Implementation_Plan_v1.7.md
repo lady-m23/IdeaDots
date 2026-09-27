@@ -5,7 +5,7 @@
 
 Sources of truth, in priority order:
 1. `docs/PLAN.md` v1.7 — product and technical specification (every `§` reference below points there).
-2. Screen spec canvas — https://claude.ai/artifact/2jiaiT6JmJ8nQ87HCbFCgN (boards A–L; each control is numbered and described).
+2. Screen spec canvas — https://claude.ai/artifact/2jiaiT6JmJ8nQ87HCbFCgN (boards A–M; each control is numbered and described).
 3. The owner's answers collected on 2026-09-27 (§2.7 of the plan, repeated in section 2 below).
 4. `CLAUDE.md` (working rules) and `design/tokens.json` v1.2 (all colors, scales, brand values).
 5. `docs/MONETIZATION_PLAN.md` (2026-09-28) — plans, limits, reverse trial, downgrade, ads, schema for P4/P16. **Updated after v1.6; wherever it and the older lines below differ, it wins** (PLAN.md v1.7 §2.8 records the decisions).
@@ -120,6 +120,7 @@ Every screen the MVP must ship, with the numbered controls to honor. Implement e
 | **J** | Sign-in (S4) & QR | Centered C1 tile, name, tagline; Apple (black/white), Google, email outlined; opens in the user's appearance (9); email code screen; Mac window with QR; iPhone approve sheet. |
 | **K** | Settings | Account · Plan · Storage · Appearance (Paper/Dark/System, text size) · Alarms & notifications · Quick capture target · Devices (Sign in on Mac, signed-in devices) · Privacy & legal · Sign out · Delete account. Mac adds hotkey, menu bar icon, launch at login. |
 | **L** | Attachments & states | Attach sheet (Photos · Camera · Files, no video notice, storage meter); offline strip, Sending / Not sent, Draft restored, attach disabled offline; storage full notice; first group tip cards. |
+| **M** | Plan, trial & limits | M1 trial welcome sheet "Pro is on for 7 days"; M2 Pro sheet (Free vs Pro table, ₩2,900 / ₩24,000); M3 trial-ended sheet with the group picker (> 5 groups, 5 most recently opened preselected), Upgrade / Continue with Free; M4 paused group (lock chip, "Paused group · use again with Pro", Change active groups); M5 full group (counter from 900, "This group is full (1,000/1,000)", Select to clean up, Upgrade). Interstitials are not drawn (off at launch). |
 
 ---
 

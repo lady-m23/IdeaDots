@@ -17,7 +17,7 @@ Status (2026-09-28): P0 (repository and tooling) done: empty Flutter app with CI
 
 1. `docs/PLAN.md` (v1.7): the **single source of truth**. Decision log, feature spec, data model,
    roadmap, open questions.
-2. Screen spec canvas: https://claude.ai/artifact/2jiaiT6JmJ8nQ87HCbFCgN (boards A–L, every control
+2. Screen spec canvas: https://claude.ai/artifact/2jiaiT6JmJ8nQ87HCbFCgN (boards A–M, every control
    numbered and described). Read it with the Artifact tool (`action: "read"`), not a web fetch.
 3. `design/tokens.json`: themes and scales. The only place colors, fonts and sizes come from.
 4. `docs/IdeaDots_Implementation_Plan_v1.7.md`: the **execution roadmap** — start at Phase 0 → Task 0.1

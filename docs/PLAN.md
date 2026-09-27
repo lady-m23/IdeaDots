@@ -11,7 +11,7 @@ phone-shaped window; on iPhone it feels identical.
 |---|---|
 | `CLAUDE.md` (repo root) | Working rules for implementation sessions |
 | `design/tokens.json` | Design tokens: shared scales, two release themes (Paper, Dark), 10 group color families with memo shades, color roles, app accent |
-| Screen spec (canvas): https://claude.ai/artifact/2jiaiT6JmJ8nQ87HCbFCgN | Annotated wireframes for every screen in this plan (boards A–L) |
+| Screen spec (canvas): https://claude.ai/artifact/2jiaiT6JmJ8nQ87HCbFCgN | Annotated wireframes for every screen in this plan (boards A–M) |
 | Earlier canvas: https://claude.ai/artifact/LbkmKd4bHkDwMCETm91PPj | First mockups and theme studies (historical; the screen spec wins on conflict) |
 | `docs/IdeaDots_Implementation_Plan_v1.7.md` | Phase → task → subtask execution roadmap for the coding agent, derived from this plan v1.7 |
 | `docs/MONETIZATION_PLAN.md` | Plans, limits, reverse trial, downgrade rules, ad rules, Supabase cost model and revenue scenarios (§7–§9 summarize it) |
@@ -221,7 +221,7 @@ them freely before the relevant phase starts.
 
 ## 4. Feature specification
 
-Screen references (A–L) point to boards in the screen spec canvas.
+Screen references (A–M; M = plan, trial and limits) point to boards in the screen spec canvas.
 
 ### 4.1 Groups (boards A, C)
 
