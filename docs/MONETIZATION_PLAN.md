@@ -1,6 +1,6 @@
 # IdeaDots — Monetization, Limits and Server Cost Plan
 
-**Version:** 1.0 · **Date:** 2026-09-28 · **Status:** owner decisions M1–M9 applied (M6–M9 on 2026-09-28); proposed defaults Q10–Q11 await confirmation
+**Version:** 1.1 · **Date:** 2026-09-28 · **Status:** final; owner decisions M1–M11 applied, no open questions
 **Parent:** `docs/PLAN.md` §7–§9 (PLAN.md wins on conflict; this file holds the numbers and the reasoning)
 **Audience:** the owner (decisions) and the coding agent (P16 Monetization, P4 schema).
 
@@ -17,12 +17,12 @@ Currency: ₩1,400 = US$1 for every estimate. Prices are Supabase's public list 
 | M3 | **Decided** | **No lifetime purchase.** Pro is a subscription only (monthly / yearly). |
 | M4 | **Decided** | **Ads only on Free.** Pro and the trial are ad-free. Free shows a banner (iOS: AdMob; macOS: house banner). |
 | M5 | **Decided** | The 90-day Free search window is dropped. Free is limited by **data per group** instead (amount: Q10). Search covers the full history on every plan. |
-| M6 | **Decided** (was Q9) | **Free storage 500 MB** (D23 kept; the 200 MB proposal is not adopted); 10 MB per file. |
-| Q10 | Proposed | **Free: 1,000 items per group** (5,000 in total). Pro: no product limit (abuse guard 50,000 per group). |
-| Q11 | Proposed | **Pro storage 20 GB** (was 30 GB); 200 MB per file unchanged. |
-| M7 | **Decided** (was Q12) | **Occasional interstitial ads on iOS Free from launch**, under the moments and caps of §6.2. The remote flag stays as a kill switch; a 10% holdout measures the effect (§6.3). |
-| M8 | **Decided** | **macOS: in-house/promotional ads only**, never third-party: house banner + occasional house interstitial with the same rules as M7. No third-party ad SDK in the Mac app. |
-| M9 | **Decided** | **Android / Windows** (later platforms, out of scope now): banner + occasional interstitial, same rules as iOS. |
+| M6 | **Decided** (was Q9) | **Free storage 200 MB** (about 500 compressed photos); 10 MB per file. |
+| M11 | **Decided** (was Q10) | **Free: 1,000 memos per group** (5,000 in total). |
+| M10 | **Decided** (was Q7, Q11) | **Pro: unlimited groups, 5 GB storage** (about 12,500 compressed photos; images always compressed, no original-quality option), **unlimited memos per group** (hidden abuse guard 50,000 per group), 200 MB per file, ₩2,900 / month or ₩24,000 / year. |
+| M7 | **Decided** (was Q12) | **Full-screen (interstitial) ads off at launch**; a **50% test starts 4 weeks after launch** (§6.3). |
+| M8 | **Decided** | **macOS: in-house/promotional ads only**, never third-party: house banner, plus a house interstitial that follows M7 (off at launch, same test). No third-party ad SDK in the Mac app. |
+| M9 | **Decided** | **Android / Windows** (later platforms, out of scope now): banner + interstitial under the same flag and rules as iOS. |
 
 ---
 
@@ -81,8 +81,7 @@ only about ₩10 per user per month. The choice should be made on **conversion**
   months, which is when an upgrade makes sense.
 - 500 MB rarely runs out, so storage stops working as a reason to upgrade.
 
-The 200 MB recommendation was not adopted: **the owner chose 500 MB (M6)**, so storage is a
-comfort limit rather than the main upgrade lever; groups (M2) and items per group (Q10) carry that role.
+**Decision (M6): 200 MB.**
 
 ### 3.2 Egress per active user
 
@@ -94,7 +93,7 @@ comfort limit rather than the main upgrade lever; groups (M2) and items per grou
 
 Egress becomes a real cost only above 250 GB/month in total, roughly 4,000 typical daily users.
 
-### 3.3 Text per group (Q10)
+### 3.3 Text per group (M11: 1,000 memos)
 
 A Free account at the proposed cap holds 5 groups × 1,000 items × 1 KB = **5 MB of database**. That
 costs **$0.0006/month (₩1)**. Text limits are **a product lever, not a cost control**. That is why
@@ -109,18 +108,17 @@ What counts toward the 1,000:
 The first 1,000 items take ~4–6 months per group for a heavy "나와의 채팅" user (5–10 memos/day), and
 longer for most users.
 
-### 3.4 Pro worst case (Q11)
+### 3.4 Pro worst case (M10: 5 GB)
 
-| | 30 GB | 20 GB |
-|---|---|---|
-| Storage of a full Pro account | $0.64/month (₩900) | $0.43/month (₩600) |
-| One full re-sync to a new device | $2.70 (₩3,800) | $1.80 (₩2,500) |
-| Net revenue of a yearly Pro per month (§5.1) | ₩1,545 | ₩1,545 |
+| | 30 GB (earlier) | 20 GB (earlier proposal) | **5 GB (decided)** |
+|---|---|---|---|
+| Storage of a full Pro account | $0.64/month (₩900) | $0.43/month (₩600) | **$0.11/month (₩150)** |
+| One full re-sync to a new device | $2.70 (₩3,800) | $1.80 (₩2,500) | **$0.45 (₩630)** |
+| Net revenue of a yearly Pro per month (§5.1) | ₩1,545 | ₩1,545 | ₩1,545 |
 
-A full 30 GB account on a yearly plan leaves only about ₩600 of margin per month, and one device
-re-sync erases several months of it.
-
-20 GB is still roughly 50,000 photos. **Recommendation: 20 GB.** The per-day upload cap and the
+With 5 GB even a full yearly account keeps about ₩1,400 of monthly margin, and a device re-sync costs
+less than half a month of it. 5 GB is about 12,500 compressed photos; images are always compressed
+(no originals), which keeps both storage and egress predictable. The per-day upload cap and the
 on-device cache (§7) protect the rest.
 
 ---
@@ -130,10 +128,10 @@ on-device cache (§7) protect the rest.
 | | Trial (7 days) | Free | Pro |
 |---|---|---|---|
 | Price | ₩0, no payment method | ₩0 | ₩2,900/month or ₩24,000/year ($2.49 / $19.99) |
-| Ads | None | iOS: AdMob banner + occasional interstitial (M7) · Mac: house banner + occasional house interstitial (M8) | None |
+| Ads | None | iOS: AdMob banner · Mac: house banner; full-screen ads off at launch, 50% test after 4 weeks (M7, M8) | None |
 | Groups | Unlimited | **5** | Unlimited |
-| Items per group | Unlimited | **1,000** (Q10) | Unlimited (guard 50,000) |
-| Storage / per file | 20 GB / 200 MB | **500 MB** (M6) / 10 MB | **20 GB** (Q11) / 200 MB |
+| Memos per group | Unlimited | **1,000** (M11) | Unlimited (hidden guard 50,000) |
+| Storage / per file | 5 GB / 200 MB | **200 MB** (M6) / 10 MB | **5 GB** (M10) / 200 MB |
 | Upload cap per day | 2 GB | 50 MB | 2 GB |
 | Search | Full history | Full history (M5) | Full history |
 | Trash | 30 days | 7 days | 30 days |
@@ -169,7 +167,7 @@ on-device cache (§7) protect the rest.
 |---|---|
 | **More than 5 groups** | The user picks 5 **active** groups. The others become **paused**: readable, searchable, exportable, and items can be selected, deleted or moved out. A paused group can't receive new items. The header shows a small lock chip and the input bar is replaced by "일시정지된 그룹 · Pro에서 다시 사용" with **Change active groups**. The active set can be changed **once per 24 h**; without that limit, swapping groups would give unlimited groups for free. |
 | **More than 1,000 items in a group** | The group stays active. New items are refused in that group until it is under the cap. The input bar shows "이 그룹이 가득 찼어요 (1,000/1,000)" with **Upgrade** and **Select to clean up**. A counter appears from 900. |
-| **Storage over 500 MB** | Every file stays viewable and downloadable. New attachments are refused until usage is under the limit. Text, tasks, links, separators and alarms keep working (PLAN §7). |
+| **Storage over 200 MB** | Every file stays viewable and downloadable. New attachments are refused until usage is under the limit. Text, tasks, links, separators and alarms keep working (PLAN §7). |
 | Group creation | The 6th group on Free opens the Pro sheet. |
 | Upgrading again | Every paused group becomes active immediately; nothing needs restoring. |
 
@@ -243,8 +241,7 @@ What the numbers say:
    - Weaker word of mouth
    - Harm to the core promise of **fast capture**
 
-   The owner chose to launch it on (M7), so these risks are handled by strict placement rules,
-   caps, a 10% holdout for measurement and the remote kill switch (§6.3).
+   That is why it launches off, with strict placement rules and a 50% test after 4 weeks (M7, §6.3).
 
 ---
 
@@ -261,7 +258,7 @@ What the numbers say:
   - **Cross-promotion of TaskHolder**, the owner's other app
 - **Hidden** during the trial and on Pro.
 
-### 6.2 Interstitial (Free: AdMob on iOS, house card on macOS; flag `ads.interstitial.enabled`, on at launch)
+### 6.2 Interstitial (Free: AdMob on iOS, house card on macOS; flag `ads.interstitial.enabled`, off at launch)
 
 Shown only **after the user finishes something**, never before or during an action.
 
@@ -286,19 +283,21 @@ Rules:
   - **App-open ads**: they delay capture, the main promise.
   - **Rewarded ads for extra quota**: too complex for the gain.
 
-### 6.3 Launch and monitoring of the interstitial (M7)
+### 6.3 Rollout of the interstitial (M7)
 
-1. Launch with interstitials **on** for iOS Free users (`ads.interstitial.enabled` = `{"pct": 90}`).
-   The server assigns a stable `ab_bucket` per user; the 10% outside `pct` never sees an
-   interstitial and is the **holdout** used to measure the effect. The owner may set `pct` to 100.
-2. Review weekly, then after 4 weeks compare exposed users with the holdout:
+1. Launch with banners only (`ads.interstitial.enabled` = `{"pct": 0}`). Collect 4 weeks of baseline:
    - D7 and D30 retention of Free users
    - trial→paid conversion
-   - banner + interstitial ARPDAU
-   - App Store rating and reviews that mention ads
-3. Keep it if exposed D30 retention is within **2 points** of the holdout, conversion does not
-   drop, and the rating holds. Otherwise lower the caps or switch it off remotely. No app release is
-   needed for either.
+   - banner ARPDAU
+   - App Store rating
+2. After 4 weeks, turn the flag on for **50% of new Free users** (`{"pct": 50}`). The server assigns a
+   stable `ab_bucket` per user; the other 50% is the control group. The Mac house interstitial
+   (M8) joins the same test.
+3. After 4 more weeks, keep it (and consider raising `pct`) if:
+   - the interstitial group's D30 retention drops by **less than 2 points**, and
+   - conversion does not drop, and
+   - the App Store rating holds.
+4. Otherwise switch it off remotely. No app release is needed.
 
 ---
 
@@ -307,7 +306,7 @@ Rules:
 | Guardrail | Rule |
 |---|---|
 | Uploads | On-device compression (PLAN §4.9). The daily upload caps in §4. No video (C9). |
-| Downloads | The uploading device seeds its own disk cache, so it never downloads its own upload. LRU disk cache for originals: iOS 500 MB, Mac 2 GB. Thumbnails in lists. Signed URLs are cacheable for the URL lifetime, so CDN hits bill as cached egress ($0.03). |
+| Downloads | The uploading device seeds its own disk cache, so it never downloads its own upload. LRU disk cache for full-size images: iOS 500 MB, Mac 2 GB. Thumbnails in lists. Signed URLs are cacheable for the URL lifetime, so CDN hits bill as cached egress ($0.03). |
 | Lists | Only the first 1,500 characters of each body per row (PLAN §6). Pages of 50. Refetch since the cursor, not full reloads. |
 | Supabase Spend Cap | **On** until 1k MAU. After that turn it **off**, because hitting the cap restricts service, and check usage weekly. |
 | Dormant data | Revisit in year 2 once the storage stock can be measured. Option: attachments of Free accounts idle > 12 months are removed after two emails; text is kept. Not adopted now. |
@@ -322,8 +321,8 @@ Rules:
 create table plan_limits (
   plan text primary key check (plan in ('free','trial','pro')),
   max_groups int,                 -- null = unlimited
-  max_items_per_group int,        -- Free 1000, Pro/trial 50000 (guard)
-  storage_bytes bigint,           -- Free 500 MB, Pro/trial 20 GB
+  max_items_per_group int,        -- Free 1000, Pro/trial 50000 (hidden abuse guard; the product says unlimited)
+  storage_bytes bigint,           -- Free 200 MB, Pro/trial 5 GB
   max_file_bytes bigint,          -- 10 MB / 200 MB
   daily_upload_bytes bigint,      -- 50 MB / 2 GB
   trash_days int,                 -- 7 / 30
@@ -365,7 +364,7 @@ create table app_config (key text primary key, value jsonb not null);  -- remote
 - **On downgrade** (first Free read after expiry), when groups > 5: the most recently opened 5
   stay active until the user chooses otherwise.
 - `app_config` keys:
-  - `ads.interstitial.enabled` (`{"pct":90}` at launch, M7)
+  - `ads.interstitial.enabled` (`{"pct":0}` at launch, `{"pct":50}` for the test, M7)
   - `ads.interstitial.min_gap_min`
   - `ads.interstitial.max_per_day`
   - `ads.interstitial.grace_days`
@@ -381,7 +380,7 @@ create table app_config (key text primary key, value jsonb not null);  -- remote
 | 16.3 RevenueCat purchase | `pro_monthly` / `pro_yearly`, no introductory offer, Restore, webhook writes `pro_expires_at`, universal purchase | Sandbox purchase on iPhone unlocks the Mac within one realtime event |
 | 16.4 Reverse trial | `start_trial()`, `trial_ledger`, welcome sheet, Plan row countdown, day-5 notice, optional 24 h local notification | New account → trial; delete account + sign up again → no trial; clock moved past the end → downgrade sheet |
 | 16.5 Downgrade flow | Trial-ended sheet, group picker, paused-group header and input bar, `set_active_groups` with the 24 h rule, full-group bar, 900+ counter | Account with 8 groups, 1,200 items in one group and 300 MB: nothing lost, every rule of §4.2 is visible |
-| 16.6 Interstitials (M7, M8) | `google_mobile_ads` interstitial on iOS; house interstitial card on macOS; one `InterstitialGate` enforcing §6.2 (moments, caps, grace, deep-link sessions) on both; `app_config` read, `ab_bucket` holdout | Flag off → never shown; flag on → shown only at the listed moments, never twice within the gap, never in a widget-opened session, never for the holdout; the macOS bundle contains no third-party ad SDK |
+| 16.6 Interstitials (M7, M8) | `google_mobile_ads` interstitial on iOS; house interstitial card on macOS; one `InterstitialGate` enforcing §6.2 (moments, caps, grace, deep-link sessions) on both; `app_config` read, `ab_bucket` | Flag off (launch) → never shown; `pct` 50 → only users in the test bucket see it, only at the listed moments, never twice within the gap, never in a widget-opened session; the macOS bundle contains no third-party ad SDK |
 
 **Owner inputs:**
 - AdMob interstitial unit id
@@ -397,7 +396,7 @@ create table app_config (key text primary key, value jsonb not null);  -- remote
 |---|---|
 | App Review questions a server-granted trial that doesn't go through IAP (Guideline 3.1.1) | Pro is unlocked only through IAP. The trial is a promotional period with no purchase. State this in the review notes. Fallback: remove the reverse trial and use an App Store 7-day introductory free trial on `pro_yearly`. |
 | Users feel the 5-group drop after the trial as a loss | Nothing is deleted or hidden. The downgrade sheet explains the rules before anything changes. Paused groups stay fully readable. |
-| The interstitial hurts ratings | Strict moments and caps, 10% holdout to measure it, remote kill switch (§6.3). |
+| The interstitial hurts ratings | Off at launch, strict moments, remote kill switch, 50% test gate (§6.3). |
 | Storage stock grows with churned users | Measure it in year 2; dormant-data option in §7. The R2 trigger in §7. |
 | Low eCPM without ATT | Accepted for a privacy-first memo app. Revisit an ATT pre-prompt only if ad revenue matters more than the current model assumes. |
 

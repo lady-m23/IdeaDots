@@ -1,6 +1,6 @@
 name: CI
 
-# macOS runners bill at 10x on private repositories, so CI runs on main and on pull requests only.
+# Public repository: standard runners (macOS included) are free. CI runs on main and on pull requests.
 on:
   push:
     branches: [main]
@@ -22,7 +22,7 @@ jobs:
       # No secrets in CI: the placeholder defines from .env.example are enough to build.
       DEFINES: --dart-define-from-file=.env.example
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: subosito/flutter-action@v2
         with:

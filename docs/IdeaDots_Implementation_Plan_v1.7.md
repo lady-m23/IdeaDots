@@ -36,7 +36,7 @@ If this document and `docs/PLAN.md` ever disagree, `docs/PLAN.md` wins and this 
 | A3 | Online-only: the server is the only source of truth. The app keeps a read-only display cache (last ~50 items per group) plus one small local file for drafts and the text send queue. No local database, no sync engine. | §6 |
 | A4 | Single user per account; no sharing or collaboration in v1. | §3.2 |
 | A5 | A signed-in device stays signed in until an explicit sign-out, device revoke, account deletion, or a rejected refresh token. | §5.5 |
-| A6 | Free plan: 5 groups, 1,000 items per group, 500 MB, 10 MB/file, ads (iOS: banner + occasional interstitial; Mac: house banner + house interstitial, no third-party SDK), full search. 7-day Pro reverse trial at first sign-in. Pro: unlimited, 20 GB, 200 MB/file, no ads. No lifetime purchase. (M1–M9, Q10–Q11) | §7, §9, MONETIZATION_PLAN |
+| A6 | Free plan: 5 groups, 1,000 memos per group, 200 MB, 10 MB/file, banner ads (iOS AdMob, Mac house banner; full-screen ads off at launch, 50% test after 4 weeks), full search. 7-day Pro reverse trial at first sign-in. Pro: unlimited groups and memos, 5 GB, 200 MB/file, images always compressed, no ads, ₩2,900 / ₩24,000. No lifetime purchase. (M1–M11) | §7, §9, MONETIZATION_PLAN |
 | A7 | Two release themes (Paper, Dark) from a registry that accepts more themes later without a data migration. Inside a group, accents follow the group's color family; elsewhere the app accent. | §11 |
 | A8 | Korean is the launch market; every user-facing string exists in Korean and English from the first screen. Further languages are added per launch country as data (ARB file + `Info.plist` code + fonts + store copy), never as code changes. | §10.5, D28 |
 | A9 | Target device class for performance: iPhone 12, 10,000 items per group at 60 fps, first paint < 300 ms from cache. | §6.9 |
@@ -71,13 +71,13 @@ All of PLAN §2 applies. The ones that most shape the build, grouped:
 - D20 Supabase: same organization as TaskHolder, **new project**, region **Seoul (ap-northeast-2)**.
 - D21 Email sign-in = 6-digit code only (external transactional email sender).
 - D22 Mac deletes only through selection (⌫ or toolbar); no Delete in the right-click menu.
-- D23 Free limits 500 MB / 10 MB per file (confirmed on 2026-09-28, M6).
+- D23 Free limits 10 MB per file; total now 200 MB (M6).
 - M1–M5 (2026-09-28): 7-day Pro reverse trial at first sign-in; Free 5 groups; no lifetime purchase; ads on Free only; 90-day search window dropped (see `docs/MONETIZATION_PLAN.md`).
-- M6–M9 (2026-09-28): Free storage 500 MB; iOS Free interstitials on from launch (kill switch, 10% holdout); macOS house ads only (house banner + house interstitial, no third-party SDK); Android/Windows later follow iOS.
+- M6–M11 (2026-09-28, final): Free 200 MB and 1,000 memos per group; full-screen ads off at launch, 50% test after 4 weeks (iOS AdMob, Mac house card); macOS house ads only; Android/Windows later follow iOS; Pro unlimited groups and memos, 5 GB, images always compressed, ₩2,900 / ₩24,000.
 - D24 Quick-capture photo while offline is **not saved** (Send disabled with a reason); memo text still queues.
 - D25 Separator deletion stays in the separator menu (two confirmed actions); memos remain multi-select only.
 - D26 Mac App Store only (sandboxed, universal purchase).
-- D27 (2026-09-28) App name **IdeaDots**: package `ideadots`, bundle ids `com.<owner>.ideadots` (+ `.widgets`), deep links `ideadots://`, widget target `IdeaDotsWidgets`.
+- D27 (2026-09-28) App name **IdeaDots**, English in every language: package `ideadots`, bundle ids `com.<owner>.ideadots` (+ `.widgets`), deep links `ideadots://`, widget target `IdeaDotsWidgets`.
 - D28 (2026-09-28) Languages are added per launch country as data (PLAN §10.5); launch with Korean and English.
 
 **Implementation defaults (PLAN §2.8, I1–I11)**: 20,000-char item limit, fold after 12 lines; due alarms stay until cleared; alarms ring on every device; a dragged separator moves its section; one-level replies collapsed by default; drafts and the outbox in one local JSON file; memo colors stored as shade levels; Markdown export rules; horizontal drags only page; no auto-created group ("Inbox" is created by the first quick capture when no group exists); image captions allowed.
@@ -90,11 +90,10 @@ All of PLAN §2 applies. The ones that most shape the build, grouped:
 |---|---|---|---|---|
 | Q5 | File storage backend (Supabase Storage vs Cloudflare R2 for egress cost) | Supabase Storage; the storage client sits behind one `AttachmentStore` interface so R2 can replace it | P11 (attachments), decide before P16 | Until P16 starts |
 | Q6 | Free search window | **Resolved (M5):** dropped; full history on every plan | P14 | — |
-| Q7 | Pricing | ₩2,900 / ₩24,000, $2.49 / $19.99; no introductory offer (reverse trial M1 instead) | P16 (store products) | Until products are created in App Store Connect |
-| Q9 | Free storage | **Resolved (M6):** 500 MB | P4 | — |
-| Q10–Q11 | Free 1,000 items/group, Pro 20 GB | Seeded in `plan_limits`; an answer only changes seed values | P4 | Until P16 |
-| Q12 | Interstitial ads | **Resolved (M7, M8):** on from launch on iOS (AdMob) and macOS (house card); `app_config` kill switch, 10% holdout | P16 | Any time (remote flag) |
-| Q13 | Korean display name | "IdeaDots" in both languages (ARB `appTitle`) | P15/P18 | Until the store listing is written |
+| Q7 | Pricing | **Resolved (M10):** ₩2,900 / ₩24,000 ($2.49 / $19.99); products without an introductory offer | P16 | — |
+| Q9–Q11 | Free storage, Free memos per group, Pro storage | **Resolved (M6, M11, M10):** 200 MB; 1,000; 5 GB | P4 | — |
+| Q12 | Interstitial ads | **Resolved (M7, M8):** off at launch; 50% test 4 weeks after launch (iOS AdMob, Mac house card) via `app_config` | P16 | Any time (remote flag) |
+| Q13 | Korean display name | **Resolved (D27):** "IdeaDots" in every language | — | — |
 | Q8 | Korean fonts | Pretendard (body) + Noto Serif KR (Paper titles) as fallbacks; verify licence + bundle size in P2 | P2 | Until P2 |
 | I11 | Photo captions | Allowed, plain text in `items.body` | P11/P12 | Until P11 |
 | — | Everything under "Deferred" (section 8) | Not built; seams noted per task | — | Post-MVP |
@@ -130,7 +129,7 @@ Every screen the MVP must ship, with the numbered controls to honor. Implement e
 |---|---|---|---|
 | FR-01 | Sign in with Apple, Google, email code; stay signed in; sign-out semantics; devices list | §5.2–5.6 | P5, P15 |
 | FR-02 | QR login Mac ← iPhone | §5.3 | P17 |
-| FR-03 | Groups: create (header `+`, empty page), rename, color (10 families), reorder, delete, 5-group Free limit (M2), 1,000 items per group (Q10), paused groups, empty page | §4.1 | P6 (limits), P16 (paused/downgrade) |
+| FR-03 | Groups: create (header `+`, empty page), rename, color (10 families), reorder, delete, 5-group Free limit (M2), 1,000 memos per group (M11), paused groups, empty page | §4.1 | P6 (limits), P16 (paused/downgrade) |
 | FR-04 | Items: text, task, link, file, image, separator; input syntax; 20,000-char limit; folding | §4.2 | P7, P8, P11 |
 | FR-05 | Sections: separators, collapse state synced, separator menu incl. deletion | §4.3 | P7, P9 |
 | FR-06 | Ordering: fractional `position`, drag-to-reorder, move to group/section, sections move whole | §4.4, §6.2 | P9 |
@@ -420,7 +419,7 @@ All modules here are platform-free Dart with exhaustive unit tests. Nothing in t
 Prerequisite: the owner creates the Supabase project (D20: TaskHolder organization, new project, Seoul) and shares the URL/anon key; the CLI is linked with `supabase link`. Everything below is written as migrations in `supabase/migrations/` and applied locally first (`supabase start`, `supabase db reset`).
 
 ### Task 4.1 — Schema migration `0001_core.sql` (§6.1)
-- **Scope:** extensions `pgcrypto`, `pg_trgm`; tables `groups` (+ `paused`, `item_count`), `items`, `attachments`, `link_previews`, `usage`, `entitlements`, `plan_limits`, `trial_ledger`, `app_config`, `qr_login_requests`, `devices` with the constraints in §6.1 and MONETIZATION_PLAN §8 (body length, separator rules, one-level replies trigger, `effective_plan()`, active groups ≤ `plan_limits.max_groups`, items per group ≤ `max_items_per_group`); indexes `items (group_id, parent_id, position) where deleted_at is null`, alarm partial index, `GIN (body gin_trgm_ops)`; `updated_at` trigger; default `entitlements` row on user creation (no trial yet; `start_trial()` arrives in P16); `plan_limits` seeded: free (5 groups, 1,000 items/group, 500 MB, 10 MB, 50 MB/day, trash 7, ads) · trial and pro (unlimited groups, guard 50,000 items/group, 20 GB, 200 MB, 2 GB/day, trash 30, no ads).
+- **Scope:** extensions `pgcrypto`, `pg_trgm`; tables `groups` (+ `paused`, `item_count`), `items`, `attachments`, `link_previews`, `usage`, `entitlements`, `plan_limits`, `trial_ledger`, `app_config`, `qr_login_requests`, `devices` with the constraints in §6.1 and MONETIZATION_PLAN §8 (body length, separator rules, one-level replies trigger, `effective_plan()`, active groups ≤ `plan_limits.max_groups`, items per group ≤ `max_items_per_group`); indexes `items (group_id, parent_id, position) where deleted_at is null`, alarm partial index, `GIN (body gin_trgm_ops)`; `updated_at` trigger; default `entitlements` row on user creation (no trial yet; `start_trial()` arrives in P16); `plan_limits` seeded: free (5 groups, 1,000 items/group, 200 MB, 10 MB, 50 MB/day, trash 7, ads) · trial and pro (unlimited groups, hidden abuse guard 50,000 items/group, 5 GB, 200 MB, 2 GB/day, trash 30, no ads).
 - **Acceptance:** `supabase db reset` applies cleanly; `supabase gen types dart` (or hand-written models) match.
 - **Tests:** SQL tests in `supabase/tests/` (pgTAP): constraints reject bad rows; the reply-depth trigger fires; the 6th group and the 1,001st item on Free are rejected; a separator is accepted at the item cap.
 - **Confirm:** yes — project creation and linking use the owner's account.
@@ -636,7 +635,7 @@ Prerequisite: the owner creates the Supabase project (D20: TaskHolder organizati
 - **Confirm:** no.
 
 ### Task 11.2 — Upload pipeline
-- **Scope:** `AttachmentStore` interface (Q5 seam) with `SupabaseAttachmentStore`: device-side image compression (long edge 2048 px, WebP ~80%; Pro "send original" switch), thumbnail (long edge 480 px) generated on device, `upload-intent` call (size, MIME) → signed URL → upload (resumable TUS for > 6 MB) → `attachments` row → image/file item with progress card and cancel; failure states; storage at 80% notice once, 100% → attach locked with lock badge and the L3 notice.
+- **Scope:** `AttachmentStore` interface (Q5 seam) with `SupabaseAttachmentStore`: device-side image compression on every plan (long edge 2048 px, WebP ~80%; no original-quality option, M10), thumbnail (long edge 480 px) generated on device, `upload-intent` call (size, MIME) → signed URL → upload (resumable TUS for > 6 MB) → `attachments` row → image/file item with progress card and cancel; failure states; storage at 80% notice once, 100% → attach locked with lock badge and the L3 notice.
 - **Acceptance:** a 20 MB PDF on Free is refused server-side; a 8 MB file uploads with progress and survives backgrounding; an image shows its thumbnail only in the list.
 - **Tests:** integration test against local Supabase for intent/refusal; unit tests for compression parameters.
 - **Confirm:** no.
@@ -742,7 +741,7 @@ Prerequisite: the owner creates the Supabase project (D20: TaskHolder organizati
 > Tasks 16.1–16.6 follow `docs/MONETIZATION_PLAN.md` §8–§9 (schema, RPCs, acceptance). Summary below.
 
 ### Task 16.1 — Entitlements and gating
-- **Scope:** `plan_limits`, `effective_plan(uid)`, insert triggers (active groups ≤ 5 on Free, items per group ≤ 1,000 excluding separators/trash, paused groups reject inserts); `EntitlementsRepo` exposes plan, limits and `trialDaysLeft`; gates: group `+` (6th → Pro sheet), full-group bar (counter from 900), quotas (500 MB / 10 MB / 50 MB per day vs 20 GB / 200 MB / 2 GB), ad slot, trash retention; `ProSheet` (Q7).
+- **Scope:** `plan_limits`, `effective_plan(uid)`, insert triggers (active groups ≤ 5 on Free, items per group ≤ 1,000 excluding separators/trash, paused groups reject inserts); `EntitlementsRepo` exposes plan, limits and `trialDaysLeft`; gates: group `+` (6th → Pro sheet), full-group bar (counter from 900), quotas (200 MB / 10 MB / 50 MB per day vs 5 GB / 200 MB / 2 GB), ad slot, trash retention; `ProSheet` (Q7).
 - **Acceptance:** editing `plan_limits` or moving `trial_ends_at` into the past flips every gate without restart; pgTAP: 6th group rejected, 1,001st item rejected, separator accepted at the cap, paused group rejects inserts.
 - **Confirm:** no.
 
@@ -766,10 +765,10 @@ Prerequisite: the owner creates the Supabase project (D20: TaskHolder organizati
 - **Acceptance:** an account with 8 groups, 1,200 items in one group and 300 MB loses nothing and shows every rule of MONETIZATION_PLAN §4.2; upgrading unpauses everything immediately.
 - **Confirm:** no.
 
-### Task 16.6 — Interstitials (M7 iOS AdMob, M8 Mac house card)
+### Task 16.6 — Interstitials behind a flag (M7 iOS AdMob, M8 Mac house card)
 - **Scope:** `google_mobile_ads` interstitial on iOS; house interstitial card on macOS (bundled promo: Pro benefits, price, Upgrade, Not now); one `InterstitialGate` for both, enforcing MONETIZATION_PLAN §6.2 (allowed moments only, never in widget/capture/share/notification/deep-link sessions, 120 s after foreground, ≥ 180 min gap, ≤ 2/day, 3-day grace after the trial, skip if not loaded); reads `app_config` and `entitlements.ab_bucket`.
-- **Acceptance:** flag off → never shown; flag on → shown only at listed moments and within caps; never in a widget-opened session; never on Pro, during the trial or for the holdout; the Mac shows only the house card and its bundle contains no Google Mobile Ads framework.
-- **Confirm:** yes — the interstitial unit id is the owner's; the flag ships on (`pct` 90, M7).
+- **Acceptance:** flag off (the launch state) → never shown; `pct` 50 → only the test bucket sees it, only at listed moments and within caps; never in a widget-opened session; never on Pro or during the trial; the Mac shows only the house card and its bundle contains no Google Mobile Ads framework.
+- **Confirm:** yes — the interstitial unit id is the owner's; the flag ships **off** (`pct` 0) and the 50% test starts 4 weeks after launch (M7).
 
 **Checkpoint P16:** purchase/restore/gating matrix in sandbox on both devices. Commit `P16: monetization`.
 

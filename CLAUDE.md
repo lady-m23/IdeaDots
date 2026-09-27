@@ -4,7 +4,7 @@ Guidance for Claude Code sessions working in this folder (`/Users/leonie/Project
 
 ## What this is
 
-**IdeaDots** (formerly Ideaholder and the working name ToDoDesk; Korean display name open, Q13) is a personal memo workspace for **iOS and macOS**, built with **Flutter** and
+**IdeaDots** (formerly Ideaholder and the working name ToDoDesk; the name is English in every language) is a personal memo workspace for **iOS and macOS**, built with **Flutter** and
 **Supabase**. It **looks like a messenger but behaves like a sortable memo list**: memos, tasks,
 links, files and section separators live in swipeable groups, and each item can be moved,
 restyled, collapsed, replied to, merged and given an alarm. On the Mac it runs as a tall,
@@ -22,8 +22,9 @@ Status (2026-09-28): P0 (repository and tooling) done: empty Flutter app with CI
 3. `design/tokens.json`: themes and scales. The only place colors, fonts and sizes come from.
 4. `docs/IdeaDots_Implementation_Plan_v1.7.md`: the **execution roadmap** — start at Phase 0 → Task 0.1
    and work sequentially; do not skip checkpoints; tasks marked `Confirm: yes` wait for the owner.
-5. `docs/MONETIZATION_PLAN.md`: plans and limits (Free 5 groups, 1,000 items/group, 500 MB; 7-day
-   reverse trial; Pro 20 GB; iOS banner + occasional interstitial; Mac house ads only), downgrade rules, ad rules, `plan_limits` schema. Read before P4 and P16;
+5. `docs/MONETIZATION_PLAN.md`: plans and limits (Free 5 groups, 1,000 memos/group, 200 MB; 7-day
+   reverse trial; Pro unlimited, 5 GB, images always compressed; banner ads, full-screen ads off at
+   launch; Mac house ads only), downgrade rules, ad rules, `plan_limits` schema. Read before P4 and P16;
    it overrides older limit values in the implementation plan.
 
 If the plan and the canvas disagree, the plan wins; fix the canvas.
@@ -153,9 +154,8 @@ supabase functions serve
 
 ## Open questions (defaults apply until answered)
 
-See `docs/PLAN.md` §14: storage backend / egress (Q5), pricing (Q7), Korean fonts (Q8), Free items
-per group (Q10), Pro storage (Q11), Korean display name (Q13). Q1–Q4, Q6, Q9 (500 MB) and Q12
-(interstitials on) are resolved (§2.7, §2.8).
+See `docs/PLAN.md` §14: storage backend / egress (Q5) and Korean fonts (Q8). Everything else,
+including every plan limit (M1–M11), is decided (§2.7, §2.8).
 
 ## P0 checklist
 
